@@ -1,6 +1,6 @@
 export default {
     api: {
-      endpoint: "https://yourserver.com/api",
+      endpoint: "https://api.clitemplate.com",
     },
     plugins: {
       mock: {

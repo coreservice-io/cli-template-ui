@@ -89,7 +89,8 @@ async function submit_reg() {
         <div class="prefix">
           <EnvelopeIcon class="icon" />
         </div>
-        <input id="email" name="email" type="email" autocomplete="email" v-model="email" :class="[validate_email ? '' : 'err', 'rounded relative pl-10']" placeholder="email" />
+        <input id="email" name="email" type="email" autocomplete="email" v-model="email"
+          :class="[validate_email ? '' : 'err', 'rounded relative pl-10']" placeholder="email" />
         <div :class="validate_email && email != '' ? 'visible' : 'invisible'" class="suffix">
           <CheckIcon class="h-5 w-5 text-success" />
         </div>
@@ -100,7 +101,10 @@ async function submit_reg() {
           <div class="prefix">
             <LockClosedIcon class="icon" />
           </div>
-          <input id="password" name="password" type="password" v-model="password" v-tippy="{ placement: 'bottom', content: t('password_rule'), trigger: 'focus' }" :class="[validate_password ? '' : 'err', 'relative pl-10 rounded-t']" autocomplete="current-password" :placeholder="t('password')" />
+          <input id="password" name="password" type="password" v-model="password"
+            v-tippy="{ placement: 'bottom', content: t('password_rule'), trigger: 'focus' }"
+            :class="[validate_password ? '' : 'err', 'relative pl-10 rounded-t']" autocomplete="current-password"
+            :placeholder="t('password')" />
 
           <div :class="validate_password && password != '' ? 'visible' : 'invisible'" class="suffix">
             <CheckIcon class="h-5 w-5 text-success" />
@@ -111,7 +115,9 @@ async function submit_reg() {
           <div class="prefix">
             <LockClosedIcon class="icon" />
           </div>
-          <input id="password_again" name="password_again" type="password" v-model="password_again" autocomplete="current-password" :class="[validate_password_again ? '' : 'err', 'relative pl-10 rounded-b']" :placeholder="t('password_again')" />
+          <input id="password_again" name="password_again" type="password" v-model="password_again"
+            autocomplete="current-password" :class="[validate_password_again ? '' : 'err', 'relative pl-10 rounded-b']"
+            :placeholder="t('password_again')" />
           <div :class="validate_password_again && password_again != '' ? 'visible' : 'invisible'" class="suffix">
             <CheckIcon class="h-5 w-5 text-success" />
           </div>
@@ -123,7 +129,8 @@ async function submit_reg() {
           <div class="prefix">
             <CalculatorIcon class="icon" />
           </div>
-          <input type="text" name="captcha" id="captcha" v-model="captcha" class="pl-10" :placeholder="t('input_captcha')" />
+          <input type="text" name="captcha" id="captcha" v-model="captcha" class="pl-10"
+            :placeholder="t('input_captcha')" />
         </div>
         <div class="btn" v-tippy="{ placement: 'bottom', content: t('change_captcha') }">
           <img class="captcha" :src="captchaImgUrl" />
@@ -142,7 +149,10 @@ async function submit_reg() {
         </div>
       </div>
 
-      <div @click="submit_reg" :class="[validate_register_ready ? '' : 'disabled', ' btn-primary w-full relative mt-3 mb-3']"><UserPlusIcon class="icon dark absolute left-3" />{{ t("register") }}</div>
+      <div @click="submit_reg"
+        :class="[validate_register_ready ? '' : 'disabled', ' btn-primary w-full relative mt-3 mb-3']">
+        <UserPlusIcon class="icon dark absolute left-3" />{{ t("register") }}
+      </div>
 
       <Divider>{{ t("or") }}</Divider>
 
