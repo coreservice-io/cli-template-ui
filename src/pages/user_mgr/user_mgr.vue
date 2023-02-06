@@ -8,6 +8,11 @@ import { ref } from "vue";
 import { NewRemoteTableMgr } from "@/utils/table";
 import { useToast } from "vue-toastification";
 import SimpleSecondarySelect from "../../components/core/select/SingleSelect.vue";
+import Treeselect from "vue3-treeselect";
+import api from "@/api";
+import useAuthStore from "@/stores/auth";
+
+const auth_store = useAuthStore();
 const toast = useToast();
 
 ////
@@ -64,8 +69,22 @@ function edit(row) {
 async function submitUpdate() {
   console.log("submitupdate");
   edit_m_loader_open.value = true;
+
   //simulate remote submit
-  await rt_mgr.sleep(2000);
+  //request api
+  let resp = await api.user.updateUser(rt_mgr.currentRowData.value.id, rt_mgr.currentRowData.value.forbidden, rt_mgr.currentRowData.value.roles, rt_mgr.currentRowData.value.permissions, auth_store.token);
+
+  if (resp.err !== null) {
+    toast.error(resp.err);
+    return;
+  }
+
+  if (resp.result.meta_status < 0) {
+    //todo  resp.result.meta_status => error msg
+    toast.error(resp.result.meta_message);
+    return;
+  }
+
   toast.success("update success");
   edit_m_open.value = false;
   edit_m_loader_open.value = false;
@@ -81,51 +100,96 @@ function onSelectedRows(params) {
 const search_open = ref(false);
 //
 const search_condition = ref({
-  id:null,
-  email_pattern:null,
-  token:null,
-  forbidden:null,
+  id: null,
+  email_pattern: null,
+  token: null,
+  forbidden: null,
 });
+
+function reset_search_condition() {
+  search_condition.value = {
+    id: null,
+    email_pattern: null,
+    token: null,
+    forbidden: null,
+  };
+}
+
+const roleOptions = ["admin", "read_only", "user"].map((id) => ({
+  id,
+  label: `${id}`,
+}));
 /////////////////////////////////////////////
 async function search_fn() {
-if (search_condition.value.id !==null && search_condition.value.id !== "") {
+  let filter = {};
+  if (search_condition.value.id !== null && search_condition.value.id !== "") {
+    // filter.id = parseInt(search_condition.value.id.trim());
     rt_mgr.updateParams({ id: parseInt(search_condition.value.id.trim()) });
   }
 
-  if (search_condition.value.email_pattern !==null && search_condition.value.email_pattern !== "") {
+  if (search_condition.value.email_pattern !== null && search_condition.value.email_pattern !== "") {
+    // filter.email_pattern = search_condition.value.email_pattern.trim();
     rt_mgr.updateParams({ email_pattern: search_condition.value.email_pattern.trim() });
   }
 
-  if (search_condition.value.token !==null && search_condition.value.token != "") {
+  if (search_condition.value.token !== null && search_condition.value.token != "") {
+    // filter.token = search_condition.value.token.trim();
     rt_mgr.updateParams({ token: search_condition.value.token.trim() });
   }
 
-  if (search_condition.value.forbidden !==null) {
+  if (search_condition.value.forbidden !== null) {
+    // filter.forbidden = search_condition.value.forbidden.value;
     rt_mgr.updateParams({ forbidden: search_condition.value.forbidden });
   }
+
+  rt_mgr.updateParams({ filter: filter });
 
   let server_params = rt_mgr.server_params_tidy();
 
   console.log("server_params:", server_params);
 
   // request api
+  let resp = await api.user.queryUser(
+    server_params.id,
+    server_params.email_pattern,
+    server_params.token,
+    server_params.forbidden,
+    server_params.limit,
+    server_params.offset,
+    auth_store.token
+  );
 
-  await rt_mgr.sleep(2000);
-  return {
-    meta_status: 1,
-    meta_msg: "",
-    result: {
-      total_count: 1000,
-      data: [
-        { id: 1, name: "John", email: "john@gmail.com", married: true, age: 20, createdAt: "2011-10-31", score: 33.43 },
-        { id: 2, name: "Jane", email: "jane@gmail.com", married: false, age: 24, createdAt: "2011-10-31", score: 30.43 },
-        { id: 3, name: "Susan", email: "crikck@gmail.com", married: true, age: 16, createdAt: "2011-10-30", score: 3.343 },
-        { id: 4, name: "Chris", email: "jos@gmail.com", married: false, age: 55, createdAt: "2011-10-11", score: 43 },
-        { id: 5, name: "Dan", email: "dan@gmail.com", married: false, age: 40, createdAt: "2011-10-21", score: 10 },
-        { id: 6, name: "John", email: "xxx@gmail.com", married: true, age: 20, createdAt: "2011-10-31", score: 95 },
-      ],
-    },
-  };
+  if (resp.err !== null) {
+    toast.error(resp.err);
+    return;
+  }
+
+  if (resp.result.meta_status < 0) {
+    //todo  resp.result.meta_status => error msg
+    toast.error(resp.result.meta_message);
+    return;
+  }
+
+  //console.log(resp.result)
+
+  return resp.result
+
+//   await rt_mgr.sleep(2000);
+//   return {
+//     meta_status: 1,
+//     meta_msg: "",
+//     result: {
+//       total_count: 1000,
+//       data: [
+//         { id: 1, name: "John", email: "john@gmail.com", married: true, age: 20, createdAt: "2011-10-31", score: 33.43 },
+//         { id: 2, name: "Jane", email: "jane@gmail.com", married: false, age: 24, createdAt: "2011-10-31", score: 30.43 },
+//         { id: 3, name: "Susan", email: "crikck@gmail.com", married: true, age: 16, createdAt: "2011-10-30", score: 3.343 },
+//         { id: 4, name: "Chris", email: "jos@gmail.com", married: false, age: 55, createdAt: "2011-10-11", score: 43 },
+//         { id: 5, name: "Dan", email: "dan@gmail.com", married: false, age: 40, createdAt: "2011-10-21", score: 10 },
+//         { id: 6, name: "John", email: "xxx@gmail.com", married: true, age: 20, createdAt: "2011-10-31", score: 95 },
+//       ],
+//     },
+//   };
 }
 /////////////////////////////////////////////
 //inital loading
@@ -145,7 +209,7 @@ rt_mgr.loadItems();
           :pagination-options="{
             enabled: true,
             mode: 'pages',
-            perPage: rt_mgr.server_params.per_page,
+            perPage: rt_mgr.server_params.limit,
             perPageDropdown: [10, 20, 50, 100, 500, 1000],
             setCurrentPage: rt_mgr.server_params.page,
             dropdownAllowAll: false,
@@ -182,7 +246,7 @@ rt_mgr.loadItems();
 
                 <div class="lg:col-span-1 input-wrap sm">
                   <div class="prefix">Email pattern</div>
-                  <input type="text" v-model="search_condition.name" class="rounded pl-15" />
+                  <input type="text" v-model="search_condition.email_pattern" class="rounded pl-15" />
                 </div>
 
                 <div class="lg:col-span-1 input-wrap sm">
@@ -194,20 +258,20 @@ rt_mgr.loadItems();
                   <!-- <div class="prefix">Forbidden</div> -->
                   <!-- <input type="text" v-model="search_condition.token" class="rounded pl-15" /> -->
                   <div class="lg:col-span-2 mt-2">
-          <SimpleSecondarySelect :options='[
-  { name: "All",  active: false },
-  { name: "Only forbidden user",  active: true },
-  { name: "Only active user",  active: false },
-]' v-model="search_condition.forbidden"></SimpleSecondarySelect>
-        </div>
+                    <SimpleSecondarySelect
+                      :options="[
+                        { name: 'All', value: null },
+                        { name: 'Only forbidden user', value: true },
+                        { name: 'Only active user', value: false },
+                      ]"
+                      v-model="search_condition.forbidden"
+                    ></SimpleSecondarySelect>
+                  </div>
                 </div>
-                
-
-                
               </div>
 
               <div class="btn btn-secondary mt-3 sm" @click="rt_mgr.loadItems">Search</div>
-              <div class="btn btn-secondary mt-3 ml-3 sm" @click="rt_mgr.loadItems">Reset</div>
+              <div class="btn btn-secondary mt-3 ml-3 sm" @click="reset_search_condition">Reset</div>
             </div>
           </template>
 
@@ -235,9 +299,18 @@ rt_mgr.loadItems();
           <template v-slot:body>
             <div class="my-2">
               <p>Email</p>
-              <input type="email" v-model="rt_mgr.currentRowData.value.name" class="sm:col-span-3 mt-1 rounded" />
-              <p class="mt-3">Score</p>
-              <input type="number" v-model="rt_mgr.currentRowData.value.score" class="sm:col-span-3 rounded mt-1" />
+              <input type="email" v-model="rt_mgr.currentRowData.value.email" class="sm:col-span-3 mt-1 rounded disabled" disabled="" />
+              <p class="mt-3">Roles</p>
+              <!-- <input type="number" v-model="rt_mgr.currentRowData.value.score" class="sm:col-span-3 rounded mt-1" /> -->
+              <div class="lg:col-span-2 mt-2">
+                <treeselect v-model="rt_mgr.currentRowData.value.roles" :multiple="true" :options="roleOptions" />
+              </div>
+              <p class="mt-3">Forbidden</p>
+              <!-- <input type="number" v-model="rt_mgr.currentRowData.value.forbidden" class="sm:col-span-3 rounded mt-1" /> -->
+              <div>
+                <label class="mr-1"><input type="checkbox" v-model="rt_mgr.currentRowData.value.forbidden" class="mr-2" />forbidden user</label>
+                <p></p>
+              </div>
             </div>
           </template>
           <template v-slot:footer>

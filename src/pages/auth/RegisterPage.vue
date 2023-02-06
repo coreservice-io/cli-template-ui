@@ -50,6 +50,13 @@ let validate_register_ready = computed(() => {
   }
   return false;
 });
+
+let validate_email_ready = computed(() => {
+  if (validate_email.value && email.value != "") {
+    return true;
+  }
+  return false;
+});
 ////
 
 async function submit_reg() {
@@ -59,7 +66,7 @@ async function submit_reg() {
 
   const overlay_store = useOverlayStore();
   overlay_store.showLoader();
-  let resp = await api.user.register(email.value, password.value, captcha.value, vcode.value);
+  let resp = await api.user.register(email.value, password.value, captchaId, captcha.value, vcode.value);
 
   if (resp.err != null) {
     toast.error(resp.err);
@@ -74,9 +81,54 @@ async function submit_reg() {
   }
 
   const auth_store = useAuthStore();
-  auth_store.setToken(resp.result.token);
+  auth_store.setToken(resp.result.user.token);
   window.location = "/";
 }
+
+async function send_vcode() {
+  if (!validate_email_ready.value) {
+    toast.error("email error");
+    return;
+  }
+
+  let resp = await api.user.getEmailVCode(email.value);
+  // console.log(resp);
+  if (resp.err !== null) {
+    toast.error(resp.err);
+
+    return;
+  }
+  if (resp.result.meta_status < 0) {
+    toast.error(resp.result.meta_message);
+    return;
+  }
+
+  toast.success("vcode send");
+}
+
+let captchaBase64 = ref("");
+let captchaId = "";
+async function refresh_captcha() {
+  let resp = await api.captcha.getCaptcha();
+  // console.log(resp);
+  if (resp.err !== null) {
+    console.log(resp.err);
+    toast.error(resp.err);
+
+    return;
+  }
+  if (resp.result.meta_status < 0) {
+    toast.error(resp.result.meta_message);
+    return;
+  }
+
+  captchaId = resp.result.id;
+  captchaBase64 = resp.result.content;
+}
+
+/////////////////////////////////////////////
+//inital loading
+refresh_captcha();
 </script>
 
 <template>
@@ -89,8 +141,7 @@ async function submit_reg() {
         <div class="prefix">
           <EnvelopeIcon class="icon" />
         </div>
-        <input id="email" name="email" type="email" autocomplete="email" v-model="email"
-          :class="[validate_email ? '' : 'err', 'rounded relative pl-10']" placeholder="email" />
+        <input id="email" name="email" type="email" autocomplete="email" v-model="email" :class="[validate_email ? '' : 'err', 'rounded relative pl-10']" placeholder="email" />
         <div :class="validate_email && email != '' ? 'visible' : 'invisible'" class="suffix">
           <CheckIcon class="h-5 w-5 text-success" />
         </div>
@@ -101,10 +152,7 @@ async function submit_reg() {
           <div class="prefix">
             <LockClosedIcon class="icon" />
           </div>
-          <input id="password" name="password" type="password" v-model="password"
-            v-tippy="{ placement: 'bottom', content: t('password_rule'), trigger: 'focus' }"
-            :class="[validate_password ? '' : 'err', 'relative pl-10 rounded-t']" autocomplete="current-password"
-            :placeholder="t('password')" />
+          <input id="password" name="password" type="password" v-model="password" v-tippy="{ placement: 'bottom', content: t('password_rule'), trigger: 'focus' }" :class="[validate_password ? '' : 'err', 'relative pl-10 rounded-t']" autocomplete="current-password" :placeholder="t('password')" />
 
           <div :class="validate_password && password != '' ? 'visible' : 'invisible'" class="suffix">
             <CheckIcon class="h-5 w-5 text-success" />
@@ -115,9 +163,7 @@ async function submit_reg() {
           <div class="prefix">
             <LockClosedIcon class="icon" />
           </div>
-          <input id="password_again" name="password_again" type="password" v-model="password_again"
-            autocomplete="current-password" :class="[validate_password_again ? '' : 'err', 'relative pl-10 rounded-b']"
-            :placeholder="t('password_again')" />
+          <input id="password_again" name="password_again" type="password" v-model="password_again" autocomplete="current-password" :class="[validate_password_again ? '' : 'err', 'relative pl-10 rounded-b']" :placeholder="t('password_again')" />
           <div :class="validate_password_again && password_again != '' ? 'visible' : 'invisible'" class="suffix">
             <CheckIcon class="h-5 w-5 text-success" />
           </div>
@@ -129,11 +175,10 @@ async function submit_reg() {
           <div class="prefix">
             <CalculatorIcon class="icon" />
           </div>
-          <input type="text" name="captcha" id="captcha" v-model="captcha" class="pl-10"
-            :placeholder="t('input_captcha')" />
+          <input type="text" name="captcha" id="captcha" v-model="captcha" class="pl-10" :placeholder="t('input_captcha')" />
         </div>
-        <div class="btn" v-tippy="{ placement: 'bottom', content: t('change_captcha') }">
-          <img class="captcha" :src="captchaImgUrl" />
+        <div class="btn" v-tippy="{ placement: 'bottom', content: t('change_captcha') }" @click="refresh_captcha">
+          <img class="captcha" v-bind:src="captchaBase64 === '' ? captchaImgUrl : captchaBase64" />
         </div>
       </div>
 
@@ -144,15 +189,12 @@ async function submit_reg() {
           </div>
           <input type="text" name="vcode" id="vcode" v-model="vcode" class="pl-10" placeholder="input your v-code" />
         </div>
-        <div class="btn" v-tippy="{ placement: 'bottom', content: t('send_vcode_to_email') }">
+        <div class="btn" v-tippy="{ placement: 'bottom', content: t('send_vcode_to_email') }" @click="send_vcode">
           <PaperAirplaneIcon /><span>{{ t("send") }}</span>
         </div>
       </div>
 
-      <div @click="submit_reg"
-        :class="[validate_register_ready ? '' : 'disabled', ' btn-primary w-full relative mt-3 mb-3']">
-        <UserPlusIcon class="icon dark absolute left-3" />{{ t("register") }}
-      </div>
+      <div @click="submit_reg" :class="[validate_register_ready ? '' : 'disabled', ' btn-primary w-full relative mt-3 mb-3']"><UserPlusIcon class="icon dark absolute left-3" />{{ t("register") }}</div>
 
       <Divider>{{ t("or") }}</Divider>
 

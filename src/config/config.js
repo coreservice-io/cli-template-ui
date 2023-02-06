@@ -4,7 +4,7 @@ export default {
     },
     plugins: {
       mock: {
-        enable: true,
+        enable: false,
       },
     },
   };

@@ -21,8 +21,8 @@ function NewRemoteTableMgr(colums, query_server_fn) {
   rt_mgr.totalRecords = ref(0);
 
   rt_mgr.server_params = {
-    page: 1, //current page
-    per_page: 10,
+    limit:10,
+    offset:0,
   };
 
   rt_mgr.updateParams = function (new_props) {
@@ -30,12 +30,14 @@ function NewRemoteTableMgr(colums, query_server_fn) {
   };
 
   rt_mgr.onPageChange = function (params) {
-    rt_mgr.updateParams({ page: params.currentPage });
+    console.log(params)
+    rt_mgr.updateParams({ limit:params.currentPerPage,offset:(params.currentPage-1)*params.currentPerPage });
     rt_mgr.loadItems();
   };
 
   rt_mgr.onPerPageChange = function (params) {
-    rt_mgr.updateParams({ page: 1, per_page: params.currentPerPage });
+    console.log(params)
+    rt_mgr.updateParams({ limit:params.currentPerPage,offset:(params.currentPage-1)*params.currentPerPage });
     rt_mgr.loadItems();
   };
 
@@ -67,8 +69,8 @@ function NewRemoteTableMgr(colums, query_server_fn) {
     rt_mgr.isLoading.value = true;
     rt_mgr.getFromServer().then((response) => {
       rt_mgr.isLoading.value = false;
-      rt_mgr.totalRecords.value = response.result.total_count;
-      rt_mgr.rows.value = response.result.data;
+      rt_mgr.totalRecords.value = response.total_count;
+      rt_mgr.rows.value = response.data;
     });
   };
 

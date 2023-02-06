@@ -1,4 +1,4 @@
-import user from "./auth/user"
+import user from "./user"
 import captcha from "./captcha"
 import kv from "./kv"
 

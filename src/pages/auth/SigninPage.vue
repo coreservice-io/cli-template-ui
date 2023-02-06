@@ -40,7 +40,8 @@ let validate_signin_ready = computed(() => {
   return false;
 });
 
-//////
+
+
 async function submit_signin() {
   if (!validate_signin_ready.value) {
     return;
@@ -48,7 +49,7 @@ async function submit_signin() {
 
   const overlay_store = useOverlayStore();
   overlay_store.showLoader();
-  let resp = await api.user.login(email.value, password.value, captcha.value);
+  let resp = await api.user.login(email.value, password.value,captchaId, captcha.value);
  
   if (resp.err != null) {
     toast.error(resp.err);
@@ -63,9 +64,34 @@ async function submit_signin() {
   }
 
   const auth_store = useAuthStore();
-  auth_store.setToken(resp.result.token);
+  auth_store.setToken(resp.result.user.token);
   window.location = "/";
 }
+
+let captchaBase64 = ref("")
+let captchaId=""
+async function refresh_captcha(){
+  let resp = await api.captcha.getCaptcha();
+            // console.log(resp);
+            if (resp.err !== null) {
+              console.log(resp.err)
+              toast.error(resp.err)
+               
+                return;
+            }
+            if (resp.result.meta_status < 0) {
+              toast.error(resp.result.meta_message)
+              return
+            }
+
+            captchaId = resp.result.id;
+            captchaBase64 = resp.result.content;
+}
+
+
+/////////////////////////////////////////////
+//inital loading
+refresh_captcha();
 </script>
 
 <template>
@@ -104,8 +130,8 @@ async function submit_signin() {
           </div>
           <input type="text" name="captcha" id="captcha" v-model="captcha" class="pl-10" :placeholder="t('input_captcha')" />
         </div>
-        <div class="btn" v-tippy="{ placement: 'bottom', content: t('change_captcha') }">
-          <img class="captcha" :src="captchaImgUrl" />
+        <div class="btn" v-tippy="{ placement: 'bottom', content: t('change_captcha') } " @click="refresh_captcha">
+          <img class="captcha" v-bind:src="captchaBase64===''?captchaImgUrl:captchaBase64" />
         </div>
       </div>
 

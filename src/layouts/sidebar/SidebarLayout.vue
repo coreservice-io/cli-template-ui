@@ -30,7 +30,7 @@ const show_sidebar = ref(false);
 if (auth_store.user == null) {
   const overlay_store = useOverlayStore();
   overlay_store.showLoader();
-  api.user.detail(auth_store.token).then((resp) => {
+  api.user.getUserInfo(auth_store.token).then((resp) => {
     if (resp.err != null || resp.result.meta_status < 0) {
       window.location = "/signin";
     } else {

@@ -21,7 +21,7 @@ async function login(email, password, captchaId, captcha) {
     });
 }
 
-async function register(email, password, captchaId, captcha, vcode,referenceKey) {
+async function register(email, password, captchaId, captcha, vcode) {
     let url = config.api.endpoint + "/api/user/register";
     return await request.Post(url, {
         email: email,
@@ -33,12 +33,14 @@ async function register(email, password, captchaId, captcha, vcode,referenceKey)
 }
 
 
-async function resetPassword(email, password, vcode) {
+async function resetPassword(email, password,captchaId, captcha, vcode) {
     let url = config.api.endpoint + "/api/user/reset_password";
     return await request.Post(url, {
         email: email,
         password: password,
         vcode: vcode,
+        captcha_id: captchaId,
+        captcha: captcha,
     });
 }
 
@@ -49,7 +51,7 @@ async function getEmailVCode(email) {
     });
 }
 
-async function queryUser(userId, emailPattern,userType,userTag,userToken,referenceKey,referenceUserId, forbidden, limit, offset, token) {
+async function queryUser(userId, emailPattern,userToken, forbidden, limit, offset, token) {
     let url = config.api.endpoint + "/api/user/query";
     return await request.Post(
         url,
@@ -68,7 +70,7 @@ async function queryUser(userId, emailPattern,userType,userTag,userToken,referen
 }
 
 
-async function updateUser(id, forbidden, roles, permissions, ipWhitelistEnabled,whitelistLimit,accountLimit, token) {
+async function updateUser(id, forbidden, roles, permissions, token) {
     let url = config.api.endpoint + "/api/user/update";
     return await request.Post(
         url,
