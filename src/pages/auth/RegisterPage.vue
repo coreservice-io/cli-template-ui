@@ -10,11 +10,12 @@ import TopbarNavLayout from "../../layouts/topbar/TopbarNavLayout.vue";
 import Divider from "../../components/core/divider/Divider.vue";
 
 import { UserPlusIcon, CursorArrowRaysIcon } from "@heroicons/vue/24/solid";
-import { EnvelopeIcon, KeyIcon, PaperAirplaneIcon, CalculatorIcon, LockClosedIcon, CheckIcon } from "@heroicons/vue/24/outline";
-import captchaImgUrl from "../../assets/captcha.png";
+import { EnvelopeIcon, KeyIcon, PaperAirplaneIcon, ArrowPathIcon, CalculatorIcon, LockClosedIcon, CheckIcon } from "@heroicons/vue/24/outline";
+import { NewCaptchaMgr } from "@/utils/user/captcha.js";
+import { NewVcodeMgr } from "@/utils/user/vcode.js";
 
 import { ref, computed } from "vue";
-import { validator } from "@/utils/index.js";
+import validator from "@/utils/validator.js";
 
 import { useI18n } from "vue-i18n";
 import lang from "./auth_lang";
@@ -39,24 +40,36 @@ let validate_password_again = computed(() => {
   return password.value === password_again.value;
 });
 
-//
-let captcha = ref("");
-//
-let vcode = ref("");
-//
+//captcha
+let captcha_mgr = NewCaptchaMgr();
+captcha_mgr.refresh_captcha();
+
+//vcode
+let send_vcode_ready = computed(() => {
+  if (validate_email.value && email.value != "" && captcha_mgr.captcha.value !== "") {
+    return true;
+  } else {
+    return false;
+  }
+});
+let vcode_mgr = NewVcodeMgr("register");
+let send_vcode = function () {
+  if (send_vcode_ready.value != true) {
+    return;
+  }
+
+  vcode_mgr.getEmailVCode(email.value, captcha_mgr.captchaId, captcha_mgr.captcha.value);
+  vcode_mgr.resetLoader();
+};
+
+///////
 let validate_register_ready = computed(() => {
-  if (validate_email.value && email.value != "" && validate_password.value && password.value != "" && validate_password_again.value && password_again.value != "" && captcha.value !== "" && vcode.value !== "") {
+  if (validate_email.value && email.value != "" && validate_password.value && password.value != "" && validate_password_again.value && password_again.value != "" && vcode_mgr.vcode.value !== "") {
     return true;
   }
   return false;
 });
 
-let validate_email_ready = computed(() => {
-  if (validate_email.value && email.value != "") {
-    return true;
-  }
-  return false;
-});
 ////
 
 async function submit_reg() {
@@ -64,9 +77,11 @@ async function submit_reg() {
     return;
   }
 
+  //console.log("submit_reset_pass", [email.value, password.value, vcode_mgr.vcode.value]);
+
   const overlay_store = useOverlayStore();
   overlay_store.showLoader();
-  let resp = await api.user.register(email.value, password.value, captchaId, captcha.value, vcode.value);
+  let resp = await api.user.register(email.value, password.value, vcode_mgr.vcode.value);
 
   if (resp.err != null) {
     toast.error(resp.err);
@@ -81,54 +96,9 @@ async function submit_reg() {
   }
 
   const auth_store = useAuthStore();
-  auth_store.setToken(resp.result.user.token);
+  auth_store.setToken(resp.result.token);
   window.location = "/";
 }
-
-async function send_vcode() {
-  if (!validate_email_ready.value) {
-    toast.error("email error");
-    return;
-  }
-
-  let resp = await api.user.getEmailVCode(email.value);
-  // console.log(resp);
-  if (resp.err !== null) {
-    toast.error(resp.err);
-
-    return;
-  }
-  if (resp.result.meta_status < 0) {
-    toast.error(resp.result.meta_message);
-    return;
-  }
-
-  toast.success("vcode send");
-}
-
-let captchaBase64 = ref("");
-let captchaId = "";
-async function refresh_captcha() {
-  let resp = await api.captcha.getCaptcha();
-  // console.log(resp);
-  if (resp.err !== null) {
-    console.log(resp.err);
-    toast.error(resp.err);
-
-    return;
-  }
-  if (resp.result.meta_status < 0) {
-    toast.error(resp.result.meta_message);
-    return;
-  }
-
-  captchaId = resp.result.id;
-  captchaBase64 = resp.result.content;
-}
-
-/////////////////////////////////////////////
-//inital loading
-refresh_captcha();
 </script>
 
 <template>
@@ -175,10 +145,12 @@ refresh_captcha();
           <div class="prefix">
             <CalculatorIcon class="icon" />
           </div>
-          <input type="text" name="captcha" id="captcha" v-model="captcha" class="pl-10" :placeholder="t('input_captcha')" />
+          <input type="text" v-model="captcha_mgr.captcha.value" class="pl-10" :placeholder="t('input_captcha')" />
         </div>
-        <div class="btn" v-tippy="{ placement: 'bottom', content: t('change_captcha') }" @click="refresh_captcha">
-          <img class="captcha" v-bind:src="captchaBase64 === '' ? captchaImgUrl : captchaBase64" />
+
+        <div class="btn" v-tippy="{ placement: 'bottom', content: t('change_captcha') }" @click="captcha_mgr.refresh_captcha">
+          <img v-if="captcha_mgr.captchaBase64.value !== ''" class="captcha" :src="captcha_mgr.captchaBase64.value" />
+          <p v-else><ArrowPathIcon />loading.......</p>
         </div>
       </div>
 
@@ -187,10 +159,14 @@ refresh_captcha();
           <div class="prefix">
             <KeyIcon class="icon" />
           </div>
-          <input type="text" name="vcode" id="vcode" v-model="vcode" class="pl-10" placeholder="input your v-code" />
+          <input type="text" name="vcode" id="vcode" v-model="vcode_mgr.vcode.value" class="pl-10" placeholder="input your v-code" />
         </div>
-        <div class="btn" v-tippy="{ placement: 'bottom', content: t('send_vcode_to_email') }" @click="send_vcode">
+
+        <div v-if="vcode_mgr.loader_secs.value == 0" :class="[send_vcode_ready ? '' : 'disabled', 'btn']" class="btn" v-tippy="{ placement: 'bottom', content: send_vcode_ready ? t('send_vcode_to_email') : t('complete_vcode_to_email') }" @click="send_vcode">
           <PaperAirplaneIcon /><span>{{ t("send") }}</span>
+        </div>
+        <div v-if="vcode_mgr.loader_secs.value != 0" class="btn">
+          <ArrowPathIcon /><span>{{ vcode_mgr.loader_secs.value }}(s)</span>
         </div>
       </div>
 

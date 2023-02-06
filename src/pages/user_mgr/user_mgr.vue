@@ -3,7 +3,7 @@ import SidebarLayout from "../../layouts/sidebar/SidebarLayout.vue";
 import Switch from "../../components/core/switch/Switch.vue";
 import { VueGoodTable } from "vue-good-table-next";
 import Modal from "@/components/core/modal/Modal.vue";
-import { PencilSquareIcon, MagnifyingGlassIcon, CalendarDaysIcon, ArrowPathIcon } from "@heroicons/vue/24/outline";
+import { PencilSquareIcon, MagnifyingGlassIcon,PlusCircleIcon, CalendarDaysIcon, ArrowPathIcon } from "@heroicons/vue/24/outline";
 import { ref } from "vue";
 import { NewRemoteTableMgr } from "@/utils/table";
 import { useToast } from "vue-toastification";
@@ -11,6 +11,8 @@ import SimpleSecondarySelect from "../../components/core/select/SingleSelect.vue
 import Treeselect from "vue3-treeselect";
 import api from "@/api";
 import useAuthStore from "@/stores/auth";
+import moment from "moment";
+import validator from "@/utils/validator.js";
 
 const auth_store = useAuthStore();
 const toast = useToast();
@@ -46,9 +48,7 @@ const colums = [
   {
     label: "Created On",
     field: "created_unixtime",
-    type: "date",
-    dateInputFormat: "",
-    dateOutputFormat: "yyyy-MM-dd HH-mm-ss",
+    type: "number",
   },
   {
     label: "Action1",
@@ -58,6 +58,61 @@ const colums = [
 
 ////
 let rt_mgr = NewRemoteTableMgr(colums, search_fn);
+
+//crete
+const create_open = ref(false);
+const create_loader_open = ref(false);
+
+/////////////////////////////////////////////
+const newUser = ref({
+  email: "",
+  password: "",
+  roles: [],
+  permissions:[],
+});
+
+async function createUser() {
+  console.log("submitcreate");
+
+  if (!validator.validateEmail(newUser.value.email )) {
+    toast.error("email error");
+    return;
+  }
+
+  if (!validator.validatePassword(newUser.value.password)) {
+    toast.error("key error");
+    return;
+  }
+
+  create_loader_open.value = true;
+
+  //simulate remote submit
+  //request api
+  let resp = await api.user.createUser(newUser.value.email, newUser.value.password, newUser.value.roles,newUser.value.permissions, auth_store.token);
+  if (resp.err !== null) {
+    toast.error(resp.err);
+    return;
+  }
+
+  if (resp.result.meta_status < 0) {
+    //todo  resp.result.meta_status => error msg
+    toast.error(resp.result.meta_message);
+    return;
+  }
+
+  toast.success("create success");
+  newUser.value = {
+    email: "",
+  password: "",
+  roles: [],
+  permissions:[],
+  };
+  create_open.value = false;
+  create_loader_open.value = false;
+  rt_mgr.loadItems(); //reload table after success
+}
+
+
 
 ///edit
 const edit_m_open = ref(false);
@@ -121,41 +176,36 @@ const roleOptions = ["admin", "read_only", "user"].map((id) => ({
 }));
 /////////////////////////////////////////////
 async function search_fn() {
-  let filter = {};
+    let id=null
   if (search_condition.value.id !== null && search_condition.value.id !== "") {
-    // filter.id = parseInt(search_condition.value.id.trim());
-    rt_mgr.updateParams({ id: parseInt(search_condition.value.id.trim()) });
+    id= parseInt(search_condition.value.id.trim());
   }
 
+  let email_pattern=null
   if (search_condition.value.email_pattern !== null && search_condition.value.email_pattern !== "") {
-    // filter.email_pattern = search_condition.value.email_pattern.trim();
-    rt_mgr.updateParams({ email_pattern: search_condition.value.email_pattern.trim() });
+    email_pattern= search_condition.value.email_pattern.trim();
   }
 
+  let token=null
   if (search_condition.value.token !== null && search_condition.value.token != "") {
-    // filter.token = search_condition.value.token.trim();
-    rt_mgr.updateParams({ token: search_condition.value.token.trim() });
+    token= search_condition.value.token.trim();
   }
 
+  let forbidden=null
   if (search_condition.value.forbidden !== null) {
-    // filter.forbidden = search_condition.value.forbidden.value;
-    rt_mgr.updateParams({ forbidden: search_condition.value.forbidden });
+    forbidden= search_condition.value.forbidden.value;
   }
 
-  rt_mgr.updateParams({ filter: filter });
-
-  let server_params = rt_mgr.server_params_tidy();
-
-  console.log("server_params:", server_params);
+  let {limit,offset}=rt_mgr.getLimitOffset()
 
   // request api
   let resp = await api.user.queryUser(
-    server_params.id,
-    server_params.email_pattern,
-    server_params.token,
-    server_params.forbidden,
-    server_params.limit,
-    server_params.offset,
+    id,
+    email_pattern,
+    token,
+    forbidden,
+    limit,
+    offset,
     auth_store.token
   );
 
@@ -173,23 +223,6 @@ async function search_fn() {
   //console.log(resp.result)
 
   return resp.result
-
-//   await rt_mgr.sleep(2000);
-//   return {
-//     meta_status: 1,
-//     meta_msg: "",
-//     result: {
-//       total_count: 1000,
-//       data: [
-//         { id: 1, name: "John", email: "john@gmail.com", married: true, age: 20, createdAt: "2011-10-31", score: 33.43 },
-//         { id: 2, name: "Jane", email: "jane@gmail.com", married: false, age: 24, createdAt: "2011-10-31", score: 30.43 },
-//         { id: 3, name: "Susan", email: "crikck@gmail.com", married: true, age: 16, createdAt: "2011-10-30", score: 3.343 },
-//         { id: 4, name: "Chris", email: "jos@gmail.com", married: false, age: 55, createdAt: "2011-10-11", score: 43 },
-//         { id: 5, name: "Dan", email: "dan@gmail.com", married: false, age: 40, createdAt: "2011-10-21", score: 10 },
-//         { id: 6, name: "John", email: "xxx@gmail.com", married: true, age: 20, createdAt: "2011-10-31", score: 95 },
-//       ],
-//     },
-//   };
 }
 /////////////////////////////////////////////
 //inital loading
@@ -209,9 +242,9 @@ rt_mgr.loadItems();
           :pagination-options="{
             enabled: true,
             mode: 'pages',
-            perPage: rt_mgr.server_params.limit,
-            perPageDropdown: [10, 20, 50, 100, 500, 1000],
-            setCurrentPage: rt_mgr.server_params.page,
+            perPage: rt_mgr.per_page,
+            perPageDropdown: [10, 20, 50, 100],
+            setCurrentPage: rt_mgr.page,
             dropdownAllowAll: false,
           }"
           :select-options="{
@@ -234,6 +267,7 @@ rt_mgr.loadItems();
           </template>
 
           <template #table-actions>
+            <button type="button" @click="create_open = true" class="btn-primary sm mr-3"><PlusCircleIcon class="prefix-icon" />New user</button>
             <button type="button" @click="rt_mgr.loadItems" class="btn-secondary sm mr-3"><ArrowPathIcon class="prefix-icon" />Refresh</button>
             <button type="button" @click="search_open = !search_open" class="btn-secondary sm"><MagnifyingGlassIcon class="prefix-icon" />Open Search</button>
 
@@ -246,7 +280,7 @@ rt_mgr.loadItems();
 
                 <div class="lg:col-span-1 input-wrap sm">
                   <div class="prefix">Email pattern</div>
-                  <input type="text" v-model="search_condition.email_pattern" class="rounded pl-15" />
+                  <input type="text" v-model="search_condition.email_pattern" class="rounded pl-28" />
                 </div>
 
                 <div class="lg:col-span-1 input-wrap sm">
@@ -284,8 +318,13 @@ rt_mgr.loadItems();
               <span class="badge secondary">{{ props.row[props.column.field] }}</span>
             </span>
 
-            <span v-else-if="props.column.field === 'married'">
-              <Switch class="sm" v-model="props.row[props.column.field]" read-only></Switch>
+            <span v-else-if="props.column.field === 'forbidden'">
+                <span v-if="props.row[props.column.field]===true" class="badge err">forbidden</span>
+                <span v-else class="badge success">active</span>
+            </span>
+
+            <span v-else-if="props.column.field === 'created_unixtime'">
+              {{ moment.unix(props.row[props.column.field]).utc().format("YYYY-MM-DD HH:mm:ss") }}
             </span>
 
             <ProgressBar class="sm" v-else-if="props.column.field === 'score'" tippy="score:" :percent="props.row[props.column.field]" />
@@ -318,6 +357,32 @@ rt_mgr.loadItems();
             <button type="button" class="btn-primary mr-3" @click="submitUpdate">Update</button>
           </template>
         </Modal>
+
+        <Modal v-model:open="create_open" v-model:showLoader="create_loader_open">
+          <template v-slot:header>New user</template>
+          <template v-slot:body>
+            <div class="my-2">
+              <p>Email</p>
+              <input type="email" v-model="newUser.email" class="sm:col-span-3 mt-1 rounded"  />
+
+              <p>Password</p>
+              <input type="email" v-model="newUser.password" class="sm:col-span-3 mt-1 rounded"  />
+
+              <p class="mt-3">Roles</p>
+              <!-- <input type="number" v-model="rt_mgr.currentRowData.value.score" class="sm:col-span-3 rounded mt-1" /> -->
+              <div class="lg:col-span-2 mt-2">
+                <treeselect v-model="newUser.roles" :multiple="true" :options="roleOptions" />
+              </div>
+              
+            </div>
+          </template>
+          <template v-slot:footer>
+            <button type="button" class="btn-secondary mr-3" @click="edit_m_open = false">Cancel</button>
+            <button type="button" class="btn-primary mr-3" @click="createUser">Create</button>
+          </template>
+        </Modal>
+
+
       </div>
     </div>
   </SidebarLayout>

@@ -18,6 +18,7 @@ export default {
       change_captcha:"change captcha",
       send:"Send",
       send_vcode_to_email:"send vcode to my email",
+      complete_vcode_to_email:"please complete email and captcha before send vcode",
     },
     zh: {
       register: "注册",
@@ -38,5 +39,6 @@ export default {
       change_captcha:"更换验证码",
       send:"发送",
       send_vcode_to_email:"发送vcode到我的邮箱",
+      complete_vcode_to_email:"请填写email和验证码,然后再发送vcode",
     },
   };

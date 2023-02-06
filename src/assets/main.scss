@@ -1,8 +1,7 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
-@import "/src/assets/custom/custom.scss";
-@import "/src/assets/custom/transition.scss";
+ 
 
 //thirdparty
 @import "tippy.js/dist/tippy.css"; // optional for styling
@@ -10,3 +9,9 @@
 @import "vue3-treeselect/dist/vue3-treeselect.css";
 @import "vue-good-table-next/dist/vue-good-table-next.css";
 @import "v-calendar/dist/style.css";
+
+@import "sweetalert2/dist/sweetalert2.min.css";
+
+//
+@import "/src/assets/custom/custom.scss";
+@import "/src/assets/custom/transition.scss";

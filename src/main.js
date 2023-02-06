@@ -6,9 +6,14 @@ import router from "./router/Router.vue";
 
 ////language////////////
 import lang from "./lang/lang";
+
+///
 import VueTippy from "vue-tippy";
 import Toast from "vue-toastification";
 import VCalendar from "v-calendar";
+
+///
+import VueSweetalert2 from 'vue-sweetalert2';
 
 //
 import "./assets/main.scss";
@@ -28,6 +33,9 @@ app.use(Toast, {
 
 // Use plugin with defaults
 app.use(VCalendar, {});
+
+//
+app.use(VueSweetalert2);
 
 app.config.warnHandler = () => null;
 

@@ -71,7 +71,10 @@ let example = [
         name: "Modals",
         icon: WindowIcon,
         open: false,
-        children: [{ name: "simple", href: "/example/modal/simple" }],
+        children: [
+          { name: "simple", href: "/example/modal/simple" },
+          { name: "dynamic", href: "/example/modal/dynamic" },
+        ],
       },
       {
         name: "Toast",

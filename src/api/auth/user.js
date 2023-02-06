@@ -1,53 +1,117 @@
 import request from "../request";
 
-import _ from "./user_mock";
+// import _ from "./user_mock";
 
-/////////////////////////////////////////////////////////////
-async function login(email, password, captcha) {
-  let url = "/api/user/login";
+import config from "@/config/config.js";
+
+async function login(email, password, captchaId, captcha) {
+  let url = config.api.endpoint + "/api/user/login";
   return await request.Post(url, {
     email: email,
     password: password,
+    captcha_id: captchaId,
     captcha: captcha,
   });
 }
 
-/////////////////////////////////////////////////////////////
-
-async function register(email, password, captcha, vcode) {
-  let url = "/api/user/register";
+async function register(email, password, vcode) {
+  let url = config.api.endpoint + "/api/user/register";
   return await request.Post(url, {
     email: email,
     password: password,
-    captcha: captcha,
     vcode: vcode,
   });
 }
 
-/////////////////////////////////////////////////////////////
-
-async function reset_pass(email, new_password, captcha, vcode) {
-  let url = "/api/user/reset_pass";
+async function resetPassword(email, password, vcode) {
+  let url = config.api.endpoint + "/api/user/reset_password";
   return await request.Post(url, {
     email: email,
-    new_password: new_password,
-    captcha: captcha,
+    password: password,
     vcode: vcode,
   });
 }
 
-/////////////////////////////////////////////////////////////
+async function getUserInfo(token) {
+  let url = config.api.endpoint + "/api/user/info";
+  return await request.Get(url, token);
+}
 
-async function detail(token) {
-  let url = "/api/user/detail";
+async function getCaptcha() {
+  let url = config.api.endpoint + "/api/user/captcha";
+  return await request.Get(url);
+}
+
+async function getEmailVCode(email, captchaId, captcha) {
+  let url = config.api.endpoint + "/api/user/email_vcode";
   return await request.Post(url, {
-    token: token,
+    email: email,
+    captcha_id: captchaId,
+    captcha: captcha,
   });
 }
+
+async function queryUser(userId, emailPattern,userToken, forbidden, limit, offset, token) {
+  let url = config.api.endpoint + "/api/user/query";
+  return await request.Post(
+      url,
+      {
+          filter: {
+              id: userId,
+              email_pattern: emailPattern,
+              token:userToken,
+              forbidden: forbidden,
+          },
+          limit: limit,
+          offset: offset,
+      },
+      token
+  );
+}
+
+
+async function updateUser(id, forbidden, roles, permissions, token) {
+  let url = config.api.endpoint + "/api/user/update";
+  return await request.Post(
+      url,
+      {
+          filter: {
+              id: [id],
+          },
+          update: {
+              forbidden: forbidden,
+              roles: roles,
+              permissions: permissions,
+          },
+      },
+      token
+  );
+}   
+
+async function createUser(email, password,roles, permissions, token) {
+  let url = config.api.endpoint + "/api/user/create";
+  return await request.Post(
+      url,
+      {
+          email:email,
+          password:password,
+          roles:roles,
+          permissions:permissions
+      },
+      token
+  );
+} 
+
+/////////////////////////////////////////////////////////////
 
 export default {
   login,
   register,
-  reset_pass,
-  detail,
+  resetPassword,
+  getUserInfo,
+  getCaptcha,
+  getEmailVCode,
+  queryUser,
+  updateUser,
+  createUser
 };

@@ -63,6 +63,10 @@ export default [
     path: "/example/modal/simple",
     component: () => import("../../pages/example/modal/ModalSimplePage.vue"),
   },
+  {
+    path: "/example/modal/dynamic",
+    component: () => import("../../pages/example/modal/DynamicPage.vue"),
+  },
   //toast
   {
     path: "/example/toast/simple",

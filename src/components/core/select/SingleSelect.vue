@@ -28,7 +28,7 @@ watch(selected, (new_selected) => {
         </template>
         <template v-else>
           <span class="list-header-empty">
-            <span class="truncate">cancel select</span>
+            <span class="truncate">select</span>
           </span>
         </template>
         <span class="list-header-suffix">
@@ -54,7 +54,7 @@ watch(selected, (new_selected) => {
           <ListboxOption as="template" v-if="option == null" :value="option" v-slot="{ active, selected }">
             <li :class="[active ? 'active' : 'inactive']">
               <div class="option-row">
-                <span :class="[selected ? 'active' : 'inactive', 'name']">cancel select</span>
+                <span :class="[selected ? 'active' : 'inactive', 'name']">unselect</span>
                 <span v-if="selected" :class="[active ? 'active' : 'inactive', 'suffix']">
                   <CheckIcon />
                 </span>

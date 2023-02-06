@@ -95,39 +95,25 @@ const search_condition = ref({
 });
 /////////////////////////////////////////////
 async function search_fn() {
-  if (search_condition.name != "") {
-    rt_mgr.updateParams({ name: search_condition.value.name.trim() });
-  }
-
-  if (search_condition.age_start != "") {
-    rt_mgr.updateParams({ age_start: search_condition.value.age_start });
-  }
-
-  if (search_condition.age_end != "") {
-    rt_mgr.updateParams({ age_end: search_condition.value.age_end });
-  }
-
-  rt_mgr.updateParams({ date_start: search_condition.value.date_range.start.toISOString().substring(0, 10), date_end: search_condition.value.date_range.end.toISOString().substring(0, 10) });
-
-  let server_params = rt_mgr.server_params_tidy();
-
-  console.log("server_params:", server_params);
+  //rt_mgr.page = 1;
+  //rt_mgr.per_page = 10;
+  //rt_mgr.sort = [];
+  //search condition
+  //rt_mgr.getLimitOffset()
 
   await rt_mgr.sleep(2000);
   return {
     meta_status: 1,
     meta_msg: "",
-    result: {
-      total_count: 1000,
-      data: [
-        { id: 1, name: "John", email: "john@gmail.com", married: true, age: 20, createdAt: "2011-10-31", score: 33.43 },
-        { id: 2, name: "Jane", email: "jane@gmail.com", married: false, age: 24, createdAt: "2011-10-31", score: 30.43 },
-        { id: 3, name: "Susan", email: "crikck@gmail.com", married: true, age: 16, createdAt: "2011-10-30", score: 3.343 },
-        { id: 4, name: "Chris", email: "jos@gmail.com", married: false, age: 55, createdAt: "2011-10-11", score: 43 },
-        { id: 5, name: "Dan", email: "dan@gmail.com", married: false, age: 40, createdAt: "2011-10-21", score: 10 },
-        { id: 6, name: "John", email: "xxx@gmail.com", married: true, age: 20, createdAt: "2011-10-31", score: 95 },
-      ],
-    },
+    total_count: 1000,
+    data: [
+      { id: 1, name: "John", email: "john@gmail.com", married: true, age: 20, createdAt: "2011-10-31", score: 33.43 },
+      { id: 2, name: "Jane", email: "jane@gmail.com", married: false, age: 24, createdAt: "2011-10-31", score: 30.43 },
+      { id: 3, name: "Susan", email: "crikck@gmail.com", married: true, age: 16, createdAt: "2011-10-30", score: 3.343 },
+      { id: 4, name: "Chris", email: "jos@gmail.com", married: false, age: 55, createdAt: "2011-10-11", score: 43 },
+      { id: 5, name: "Dan", email: "dan@gmail.com", married: false, age: 40, createdAt: "2011-10-21", score: 10 },
+      { id: 6, name: "John", email: "xxx@gmail.com", married: true, age: 20, createdAt: "2011-10-31", score: 95 },
+    ],
   };
 }
 /////////////////////////////////////////////
@@ -148,9 +134,9 @@ rt_mgr.loadItems();
           :pagination-options="{
             enabled: true,
             mode: 'records',
-            perPage: rt_mgr.server_params.per_page,
+            perPage: rt_mgr.per_page,
             perPageDropdown: [20, 50, 100],
-            setCurrentPage: rt_mgr.server_params.page,
+            setCurrentPage: rt_mgr.page,
             dropdownAllowAll: false,
           }"
           :select-options="{
@@ -164,7 +150,6 @@ rt_mgr.loadItems();
           :isLoading.sync="rt_mgr.isLoading.value"
           v-on:page-change="rt_mgr.onPageChange"
           v-on:sort-change="rt_mgr.onSortChange"
-          v-on:column-filter="rt_mgr.onColumnFilter"
           v-on:per-page-change="rt_mgr.onPerPageChange"
           v-on:selected-rows-change="onSelectedRows"
         >
@@ -221,7 +206,7 @@ rt_mgr.loadItems();
             </span>
 
             <span v-else-if="props.column.field === 'email'">
-              <span  class="badge secondary">{{ props.row[props.column.field] }}</span>
+              <span class="badge secondary">{{ props.row[props.column.field] }}</span>
             </span>
 
             <span v-else-if="props.column.field === 'married'">

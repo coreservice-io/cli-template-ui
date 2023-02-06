@@ -48,7 +48,7 @@ function close() {
               <div class="bg-white px-6 lg:px-8 pt-3 pb-4">
                 <slot name="body"></slot>
               </div>
-              <div v-if="$slots.footer" class="bg-gray-50 px-6 lg:px-8 py-3 flex-row-reverse flex">
+              <div v-if="$slots.footer" class="bg-gray-50 px-2 py-3 flex-row-reverse flex">
                 <slot name="footer"></slot>
               </div>
             </DialogPanel>

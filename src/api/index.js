@@ -1,9 +1,7 @@
-import user from "./user"
-import captcha from "./captcha"
+import user from "./auth/user";
 import kv from "./kv"
 
 export default {
-    user: user,
-    captcha,
-    kv,
-}
+  user,
+  kv
+};

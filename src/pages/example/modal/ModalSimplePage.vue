@@ -43,8 +43,13 @@ const warning = ref(false);
               </div>
             </template>
             <template v-slot:footer>
-              <button type="button" class="btn-err mr-3" @click="open_m_close = false">Deactivate</button>
-              <button type="button" class="btn-secondary mr-3" @click="open_m_close = false">Cancel</button>
+              <div class="justify-between flex w-full">
+                <button type="button" class="btn-err ml-3" @click="open_m_close = false">Deactivate</button>
+                <div>
+                  <button type="button" class="btn-primary mr-3" @click="open = false">Confirm</button>
+                  <button type="button" class="btn-secondary mr-3" @click="open_m_close = false">Cancel</button>
+                </div>
+              </div>
             </template>
           </Modal>
         </div>

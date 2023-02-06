@@ -26,7 +26,7 @@ if (auth_store.token == null || auth_store.token == "") {
 }
 
 const show_sidebar = ref(false);
-//get user detail
+//getUserInfo
 if (auth_store.user == null) {
   const overlay_store = useOverlayStore();
   overlay_store.showLoader();

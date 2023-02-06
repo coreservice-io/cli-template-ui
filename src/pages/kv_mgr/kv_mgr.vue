@@ -6,7 +6,7 @@ import Switch from "../../components/core/switch/Switch.vue";
 import { VueGoodTable } from "vue-good-table-next";
 
 import Modal from "@/components/core/modal/Modal.vue";
-import { PencilSquareIcon,PlusCircleIcon, MagnifyingGlassIcon, CalendarDaysIcon, ArrowPathIcon } from "@heroicons/vue/24/outline";
+import { PencilSquareIcon, PlusCircleIcon, MagnifyingGlassIcon, CalendarDaysIcon, ArrowPathIcon } from "@heroicons/vue/24/outline";
 
 import { ref } from "vue";
 
@@ -18,12 +18,15 @@ import { useToast } from "vue-toastification";
 import api from "@/api";
 import useAuthStore from "@/stores/auth";
 
+import { inject } from "vue";
+const swal = inject("$swal");
+
 const auth_store = useAuthStore();
 
 const toast = useToast();
 
 ////
-const colums = [
+const columns = [
   {
     label: "ID",
     field: "id",
@@ -43,28 +46,30 @@ const colums = [
     type: "text",
   },
   {
-    label: "Action1",
-    field: "action1",
+    label: "Action",
+    field: "action",
   },
 ];
 
+let rows = ref([]);
+let currentRow = {};
 ////
-let rt_mgr = NewRemoteTableMgr(colums, search_fn);
+// let rt_mgr = NewRemoteTableMgr(colums, search_fn);
 
 ///edit
 const edit_m_open = ref(false);
 const edit_m_loader_open = ref(false);
 function edit(row) {
-  rt_mgr.setCurrentRowData(row);
+  currentRow = row;
   edit_m_open.value = true;
 }
 async function submitUpdate() {
   console.log("submitupdate");
   edit_m_loader_open.value = true;
-  
+
   //simulate remote submit
   //request api
-  let resp = await api.kv.updateKv(rt_mgr.currentRowData.value.key,rt_mgr.currentRowData.value.value,rt_mgr.currentRowData.value.description,auth_store.token)
+  let resp = await api.kv.updateKv(currentRow.key, currentRow.value, currentRow.description, auth_store.token);
   if (resp.err !== null) {
     toast.error(resp.err);
     return;
@@ -79,16 +84,29 @@ async function submitUpdate() {
   toast.success("update success");
   edit_m_open.value = false;
   edit_m_loader_open.value = false;
-  rt_mgr.loadItems(); //reload table after success
+  search_fn(); //reload table after success
 }
 // delete
-async function deleteRecord(){
-    console.log("submitupdate");
+async function deleteRecord() {
+  let result = await swal.fire({
+    title: "Do you confirm?",
+    showDenyButton: true,
+    showCancelButton: true,
+    showConfirmButton: false,
+    confirmButtonText: "Delete",
+    denyButtonText: "Delete",
+  });
+
+  if (!result.idDenied) {
+    return;
+  }
+
+  console.log("submitupdate");
   edit_m_loader_open.value = true;
-  
+
   //simulate remote submit
   //request api
-  let resp = await api.kv.deleteKv([rt_mgr.currentRowData.value.key],auth_store.token)
+  let resp = await api.kv.deleteKv([currentRow.key], auth_store.token);
   if (resp.err !== null) {
     toast.error(resp.err);
     return;
@@ -103,7 +121,7 @@ async function deleteRecord(){
   toast.success("delete success");
   edit_m_open.value = false;
   edit_m_loader_open.value = false;
-  rt_mgr.loadItems(); //reload table after success
+  search_fn(); //reload table after success
 }
 
 //selection
@@ -112,7 +130,7 @@ function onSelectedRows(params) {
 }
 
 ///create/////
-const create_open = ref(false)
+const create_open = ref(false);
 const create_loader_open = ref(false);
 /////////////////////////////////////////////
 const new_record = ref({
@@ -121,19 +139,19 @@ const new_record = ref({
   description: "",
 });
 
-async function createRecord(){
-    console.log("submitcreate");
+async function createRecord() {
+  console.log("submitcreate");
 
-    if (new_record.value.key===""){
-        toast.error("key error");
+  if (new_record.value.key === "") {
+    toast.error("key error");
     return;
-    }
+  }
 
   create_loader_open.value = true;
-  
+
   //simulate remote submit
   //request api
-  let resp = await api.kv.createKv(new_record.value.key,new_record.value.value,new_record.value.description, auth_store.token)
+  let resp = await api.kv.createKv(new_record.value.key, new_record.value.value, new_record.value.description, auth_store.token);
   if (resp.err !== null) {
     toast.error(resp.err);
     return;
@@ -146,23 +164,18 @@ async function createRecord(){
   }
 
   toast.success("create success");
-  new_record.value={
+  new_record.value = {
     key: "",
-  value: "",
-  description: "",
-  }
+    value: "",
+    description: "",
+  };
   create_open.value = false;
   create_loader_open.value = false;
-  rt_mgr.loadItems(); //reload table after success
+  search_fn(); //reload table after success
 }
 
 async function search_fn() {
-  
-  let server_params = rt_mgr.server_params_tidy();
-
-  console.log("server_params:", server_params);
-
-  let resp = await api.kv.queryKv(null,auth_store.token)
+  let resp = await api.kv.queryKv(null, auth_store.token);
 
   if (resp.err !== null) {
     toast.error(resp.err);
@@ -175,12 +188,11 @@ async function search_fn() {
     return;
   }
 
-  return resp.result
-
+  rows.value = resp.result.data;
 }
 /////////////////////////////////////////////
 //inital loading
-rt_mgr.loadItems();
+search_fn();
 </script>
 
 <template>
@@ -193,27 +205,24 @@ rt_mgr.loadItems();
 
       <div>
         <vue-good-table
+          :search-options="{
+            enabled: false,
+            placeholder: 'search table',
+          }"
           :pagination-options="{
             enabled: true,
             mode: 'records',
-            perPage: rt_mgr.server_params.limit,
+            perPage: 10,
             perPageDropdown: [10, 20, 50, 100],
-            setCurrentPage: rt_mgr.server_params.page,
+            setCurrentPage: 1,
             dropdownAllowAll: false,
           }"
           :select-options="{
             enabled: false,
             selectOnCheckboxOnly: true, // only select when checkbox is clicked instead of the row
           }"
-          :columns="rt_mgr.columns"
-          :rows="rt_mgr.rows.value"
-          :totalRows="rt_mgr.totalRecords.value"
-          mode="remote"
-          :isLoading.sync="rt_mgr.isLoading.value"
-          v-on:page-change="rt_mgr.onPageChange"
-          v-on:sort-change="rt_mgr.onSortChange"
-          v-on:column-filter="rt_mgr.onColumnFilter"
-          v-on:per-page-change="rt_mgr.onPerPageChange"
+          :columns="columns"
+          :rows="rows"
           v-on:selected-rows-change="onSelectedRows"
         >
           <template #selected-row-actions>
@@ -222,14 +231,14 @@ rt_mgr.loadItems();
 
           <template #table-actions>
             <button type="button" @click="create_open = true" class="btn-primary sm mr-3"><PlusCircleIcon class="prefix-icon" />Add Key</button>
-            <button type="button" @click="rt_mgr.loadItems" class="btn-secondary sm mr-3"><ArrowPathIcon class="prefix-icon" />Refresh</button>
+            <button type="button" @click="search_fn" class="btn-secondary sm mr-3"><ArrowPathIcon class="prefix-icon" />Refresh</button>
           </template>
 
           <template #table-row="props">
-            <span v-if="props.column.field === 'action1'">
-              <button type="button" @click="edit(props.row)" class="btn-secondary xs"><PencilSquareIcon class="prefix-icon" />Edit</button>
+            <span v-if="props.column.field === 'action'">
+              <button type="button" @click="edit(props.row)" class="btn-secondary xs"><PencilSquareIcon class="prefix-icon" />Edit/Delete</button>
             </span>
-            
+
             <!-- Column: Common -->
             <span v-else>{{ props.row[props.column.field] }}</span>
           </template>
@@ -240,17 +249,21 @@ rt_mgr.loadItems();
           <template v-slot:body>
             <div class="my-2">
               <p>Key</p>
-              <input type="text" v-model="rt_mgr.currentRowData.value.key" class="sm:col-span-3 mt-1 rounded disabled" disabled/>
+              <input type="text" v-model="currentRow.key" class="sm:col-span-3 mt-1 rounded disabled" disabled />
               <p class="mt-3">Value</p>
-              <textarea type="text" v-model="rt_mgr.currentRowData.value.value" class="sm:col-span-3 rounded mt-1" />
+              <textarea type="text" v-model="currentRow.value" class="sm:col-span-3 rounded mt-1" />
               <p class="mt-3">Description</p>
-              <input type="text" v-model="rt_mgr.currentRowData.value.description" class="sm:col-span-3 rounded mt-1" />
+              <input type="text" v-model="currentRow.description" class="sm:col-span-3 rounded mt-1" />
             </div>
           </template>
           <template v-slot:footer>
-            <button type="button" class="btn-secondary mr-3" @click="edit_m_open = false">Cancel</button>
-            <button type="button" class="btn-primary mr-3" @click="submitUpdate">Update</button>
-            <button type="button" class="btn-err mr-3" @click="deleteRecord">Delete</button>
+            <div class="justify-between flex w-full">
+              <button type="button" class="btn-err ml-3" @click="deleteRecord">Delete</button>
+              <div>
+                <button type="button" class="btn-primary mr-3" @click="submitUpdate">Update</button>
+                <button type="button" class="btn-secondary mr-3" @click="edit_m_open = false">Cancel</button>
+              </div>
+            </div>
           </template>
         </Modal>
 
@@ -259,7 +272,7 @@ rt_mgr.loadItems();
           <template v-slot:body>
             <div class="my-2">
               <p>Key</p>
-              <input type="text" v-model="new_record.key" class="sm:col-span-3 mt-1 rounded"/>
+              <input type="text" v-model="new_record.key" class="sm:col-span-3 mt-1 rounded" />
               <p class="mt-3">Value</p>
               <textarea type="text" v-model="new_record.value" class="sm:col-span-3 rounded mt-1" />
               <p class="mt-3">Description</p>
