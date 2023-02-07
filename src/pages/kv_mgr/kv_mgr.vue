@@ -60,7 +60,7 @@ let currentRow = {};
 const edit_m_open = ref(false);
 const edit_m_loader_open = ref(false);
 function edit(row) {
-  currentRow = row;
+  currentRow = Object.assign({}, row)
   edit_m_open.value = true;
 }
 async function submitUpdate() {
