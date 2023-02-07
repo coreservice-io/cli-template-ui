@@ -27,15 +27,16 @@
 
                 &.active {
                     @apply bg-green-400;
+                    @apply mr-3;
                 }
 
                 &.inactive {
                     @apply bg-gray-200;
+                    @apply mr-3;
                 }
             }
 
             .name {
-                @apply ml-3;
                 @apply block;
                 @apply truncate;
             }
@@ -118,16 +119,17 @@
                     @apply rounded-full;
 
                     &.active {
+                        @apply mr-3;
                         @apply bg-green-400;
                     }
 
                     &.inactive {
+                        @apply mr-3;
                         @apply bg-gray-200;
                     }
                 }
 
                 .name {
-                    @apply ml-3;
                     @apply truncate;
                 }
 

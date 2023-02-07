@@ -21,7 +21,7 @@ watch(selected, (new_selected) => {
       <ListboxButton class="list-box-btn w-full py-2 pl-3 pr-10">
         <template v-if="selected != null">
           <span class="list-header">
-            <span :class="[selected.active ? 'active' : 'inactive', 'status']" />
+            <span v-if="(typeof selected.active !='undefined')" :class="[selected.active ? 'active' : 'inactive', 'status']" />
             <span class="name">{{ selected.name }}</span>
             <span class="secondary">{{ selected.secondary }}</span>
           </span>
@@ -41,7 +41,7 @@ watch(selected, (new_selected) => {
           <ListboxOption as="template" v-if="option != null" :value="option" v-slot="{ active, selected }">
             <li :class="[active ? 'active' : 'inactive']">
               <div class="option-row">
-                <span :class="[option.active ? 'active' : 'inactive', 'status']"></span>
+                <span  v-if="(typeof option.active !='undefined')" :class="[option.active ? 'active' : 'inactive', 'status']"></span>
                 <span :class="[selected ? 'active' : 'inactive', 'name']">{{ option.name }}</span>
                 <span :class="[active ? 'active' : 'inactive', 'secondary']">{{ option.secondary }}</span>
                 <span v-if="selected" :class="[active ? 'active' : 'inactive', 'suffix']">

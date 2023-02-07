@@ -1,13 +1,13 @@
 <script setup>
-import SidebarLayout from "../../layouts/sidebar/SidebarLayout.vue";
-import Switch from "../../components/core/switch/Switch.vue";
+import SidebarLayout from "@/layouts/sidebar/SidebarLayout.vue";
+
 import { VueGoodTable } from "vue-good-table-next";
 import Modal from "@/components/core/modal/Modal.vue";
-import { PencilSquareIcon, MagnifyingGlassIcon,PlusCircleIcon, CalendarDaysIcon, ArrowPathIcon } from "@heroicons/vue/24/outline";
+import { PencilSquareIcon, MagnifyingGlassIcon, PlusCircleIcon, ArrowPathIcon } from "@heroicons/vue/24/outline";
 import { ref } from "vue";
 import { NewRemoteTableMgr } from "@/utils/table";
 import { useToast } from "vue-toastification";
-import SimpleSecondarySelect from "../../components/core/select/SingleSelect.vue";
+import SimpleSecondarySelect from "@/components/core/select/SingleSelect.vue";
 import Treeselect from "vue3-treeselect";
 import api from "@/api";
 import useAuthStore from "@/stores/auth";
@@ -73,13 +73,13 @@ const newUser = ref({
   email: "",
   password: "",
   roles: [],
-  permissions:[],
+  permissions: [],
 });
 
 async function createUser() {
   console.log("submitcreate");
 
-  if (!validator.validateEmail(newUser.value.email )) {
+  if (!validator.validateEmail(newUser.value.email)) {
     toast.error("email error");
     return;
   }
@@ -93,7 +93,7 @@ async function createUser() {
 
   //simulate remote submit
   //request api
-  let resp = await api.user.createUser(newUser.value.email, newUser.value.password, newUser.value.roles,newUser.value.permissions, auth_store.token);
+  let resp = await api.user.createUser(newUser.value.email, newUser.value.password, newUser.value.roles, newUser.value.permissions, auth_store.token);
   if (resp.err !== null) {
     toast.error(resp.err);
     return;
@@ -108,16 +108,14 @@ async function createUser() {
   toast.success("create success");
   newUser.value = {
     email: "",
-  password: "",
-  roles: [],
-  permissions:[],
+    password: "",
+    roles: [],
+    permissions: [],
   };
   create_open.value = false;
   create_loader_open.value = false;
   rt_mgr.loadItems(); //reload table after success
 }
-
-
 
 ///edit
 const edit_m_open = ref(false);
@@ -181,38 +179,30 @@ const roleOptions = ["admin", "read_only", "user"].map((id) => ({
 }));
 /////////////////////////////////////////////
 async function search_fn() {
-    let id=null
+  let id = null;
   if (search_condition.value.id !== null && search_condition.value.id !== "") {
-    id= parseInt(search_condition.value.id.trim());
+    id = parseInt(search_condition.value.id.trim());
   }
 
-  let email_pattern=null
+  let email_pattern = null;
   if (search_condition.value.email_pattern !== null && search_condition.value.email_pattern !== "") {
-    email_pattern= search_condition.value.email_pattern.trim();
+    email_pattern = search_condition.value.email_pattern.trim();
   }
 
-  let token=null
+  let token = null;
   if (search_condition.value.token !== null && search_condition.value.token != "") {
-    token= search_condition.value.token.trim();
+    token = search_condition.value.token.trim();
   }
 
-  let forbidden=null
+  let forbidden = null;
   if (search_condition.value.forbidden !== null) {
-    forbidden= search_condition.value.forbidden.value;
+    forbidden = search_condition.value.forbidden.value;
   }
 
-  let {limit,offset}=rt_mgr.getLimitOffset()
+  let { limit, offset } = rt_mgr.getLimitOffset();
 
   // request api
-  let resp = await api.user.queryUser(
-    id,
-    email_pattern,
-    token,
-    forbidden,
-    limit,
-    offset,
-    auth_store.token
-  );
+  let resp = await api.user.queryUser(id, email_pattern, token, forbidden, limit, offset, auth_store.token);
 
   if (resp.err !== null) {
     toast.error(resp.err);
@@ -227,7 +217,7 @@ async function search_fn() {
 
   //console.log(resp.result)
 
-  return resp.result
+  return resp.result;
 }
 /////////////////////////////////////////////
 //inital loading
@@ -239,7 +229,7 @@ rt_mgr.loadItems();
     <div class="space-y-8">
       <div>
         <h1 class="text-2xl leading-6">User Manager</h1>
-        <p class="mt-3"></p>
+        <p class="mt-3">user manager for admin</p>
       </div>
 
       <div>
@@ -294,8 +284,6 @@ rt_mgr.loadItems();
                 </div>
 
                 <div class="lg:col-span-1 input-wrap sm">
-                  <!-- <div class="prefix">Forbidden</div> -->
-                  <!-- <input type="text" v-model="search_condition.token" class="rounded pl-15" /> -->
                   <div class="lg:col-span-2 mt-2">
                     <SimpleSecondarySelect
                       :options="[
@@ -324,17 +312,17 @@ rt_mgr.loadItems();
             </span>
 
             <span v-else-if="props.column.field === 'forbidden'">
-                <span v-if="props.row[props.column.field]===true" class="badge err">forbidden</span>
-                <span v-else class="badge success">active</span>
+              <span v-if="props.row[props.column.field] === true" class="badge err">forbidden</span>
+              <span v-else class="badge success">active</span>
             </span>
 
             <span v-else-if="props.column.field === 'is_super_token'">
-                <span v-if="props.row[props.column.field]===true" class="badge success">super</span>
-                <span v-else class="badge secondary">normal</span>
+              <span v-if="props.row[props.column.field] === true" class="badge success">super</span>
+              <span v-else class="badge secondary">normal</span>
             </span>
 
             <span v-else-if="props.column.field === 'roles'">
-                <span v-for="role in props.row[props.column.field]" class="badge secondary mr-1">{{ role }}</span>
+              <span v-for="role in props.row[props.column.field]" class="badge secondary mr-1">{{ role }}</span>
             </span>
 
             <span v-else-if="props.column.field === 'created_unixtime'">
@@ -353,16 +341,13 @@ rt_mgr.loadItems();
             <div class="my-2">
               <p>Email</p>
               <input type="email" v-model="rt_mgr.currentRowData.value.email" class="sm:col-span-3 mt-1 rounded disabled" disabled="" />
-              <p class="mt-3">Roles</p>
-              <!-- <input type="number" v-model="rt_mgr.currentRowData.value.score" class="sm:col-span-3 rounded mt-1" /> -->
+              <p class="mt-4">Roles</p>
               <div class="lg:col-span-2 mt-2">
                 <treeselect v-model="rt_mgr.currentRowData.value.roles" :multiple="true" :options="roleOptions" />
               </div>
-              <p class="mt-3">Forbidden</p>
-              <!-- <input type="number" v-model="rt_mgr.currentRowData.value.forbidden" class="sm:col-span-3 rounded mt-1" /> -->
+              <p class="mt-5">Forbidden</p>
               <div>
-                <label class="mr-1"><input type="checkbox" v-model="rt_mgr.currentRowData.value.forbidden" class="mr-2" />forbidden user</label>
-                <p></p>
+                <label class="mr-1 mt-2"><input type="checkbox" v-model="rt_mgr.currentRowData.value.forbidden" class="mr-2" />forbidden</label>
               </div>
             </div>
           </template>
@@ -377,17 +362,15 @@ rt_mgr.loadItems();
           <template v-slot:body>
             <div class="my-2">
               <p>Email</p>
-              <input type="email" v-model="newUser.email" class="sm:col-span-3 mt-1 rounded"  />
+              <input type="email" v-model="newUser.email" class="sm:col-span-3 mt-1 rounded" />
 
               <p>Password</p>
-              <input type="email" v-model="newUser.password" class="sm:col-span-3 mt-1 rounded"  />
+              <input type="email" v-model="newUser.password" class="sm:col-span-3 mt-1 rounded" />
 
               <p class="mt-3">Roles</p>
-              <!-- <input type="number" v-model="rt_mgr.currentRowData.value.score" class="sm:col-span-3 rounded mt-1" /> -->
               <div class="lg:col-span-2 mt-2">
                 <treeselect v-model="newUser.roles" :multiple="true" :options="roleOptions" />
               </div>
-              
             </div>
           </template>
           <template v-slot:footer>
@@ -395,8 +378,6 @@ rt_mgr.loadItems();
             <button type="button" class="btn-primary mr-3" @click="createUser">Create</button>
           </template>
         </Modal>
-
-
       </div>
     </div>
   </SidebarLayout>

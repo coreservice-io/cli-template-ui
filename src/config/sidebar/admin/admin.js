@@ -1,4 +1,4 @@
-import { UsersIcon,TagIcon, ListBulletIcon, CodeBracketIcon, ArrowsPointingOutIcon, ViewColumnsIcon, TableCellsIcon, ChartBarIcon, FlagIcon, AdjustmentsHorizontalIcon, ChevronDoubleRightIcon, PlayIcon, WindowIcon, ChatBubbleLeftIcon, PhotoIcon, InformationCircleIcon, StopIcon, ViewfinderCircleIcon, CommandLineIcon, FolderIcon, ClipboardDocumentListIcon } from "@heroicons/vue/24/outline";
+import { UsersIcon, FolderIcon,CircleStackIcon } from "@heroicons/vue/24/outline";
 
 let admin = [
   {
@@ -20,7 +20,7 @@ let admin = [
       },
       {
         name: "dbkv",
-        icon: ListBulletIcon,
+        icon: CircleStackIcon,
         open: false,
         href: "/admin/kv_mgr",
         auth: function (user) {

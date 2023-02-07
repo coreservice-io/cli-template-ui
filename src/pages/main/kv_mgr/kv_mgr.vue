@@ -1,7 +1,5 @@
 <script setup>
-import SidebarLayout from "../../layouts/sidebar/SidebarLayout.vue";
-
-import Switch from "../../components/core/switch/Switch.vue";
+import SidebarLayout from "@/layouts/sidebar/SidebarLayout.vue";
 
 import { VueGoodTable } from "vue-good-table-next";
 
@@ -9,10 +7,6 @@ import Modal from "@/components/core/modal/Modal.vue";
 import { PencilSquareIcon, PlusCircleIcon, MagnifyingGlassIcon, CalendarDaysIcon, ArrowPathIcon } from "@heroicons/vue/24/outline";
 
 import { ref } from "vue";
-
-import { NewRemoteTableMgr } from "@/utils/table";
-
-import ProgressBar from "../../components/core/progress/ProgressBar.vue";
 
 import { useToast } from "vue-toastification";
 import api from "@/api";
@@ -60,7 +54,7 @@ let currentRow = {};
 const edit_m_open = ref(false);
 const edit_m_loader_open = ref(false);
 function edit(row) {
-  currentRow = Object.assign({}, row)
+  currentRow = Object.assign({}, row);
   edit_m_open.value = true;
 }
 async function submitUpdate() {
@@ -200,7 +194,7 @@ search_fn();
     <div class="space-y-8">
       <div>
         <h1 class="text-2xl leading-6">DBKV</h1>
-        <p class="mt-3"></p>
+        <p class="mt-3">database key-value manager</p>
       </div>
 
       <div>
