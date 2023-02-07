@@ -37,6 +37,11 @@ const colums = [
     field: "token",
   },
   {
+    label: "Super token",
+    field: "is_super_token",
+    type: "bool",
+  },
+  {
     label: "Forbidden",
     field: "forbidden",
     type: "bool",
@@ -321,6 +326,11 @@ rt_mgr.loadItems();
             <span v-else-if="props.column.field === 'forbidden'">
                 <span v-if="props.row[props.column.field]===true" class="badge err">forbidden</span>
                 <span v-else class="badge success">active</span>
+            </span>
+
+            <span v-else-if="props.column.field === 'is_super_token'">
+                <span v-if="props.row[props.column.field]===true" class="badge success">super</span>
+                <span v-else class="badge secondary">normal</span>
             </span>
 
             <span v-else-if="props.column.field === 'roles'">

@@ -15,7 +15,7 @@ i18n.setLang = function (lang) {
   window.localStorage.setItem("lang", lang);
 };
 
-i18n.merge_lang = function (merged_lang, lang) {
+i18n.merge_lang = function (merged_lang, ...langs) {
   let result_lang = {};
 
   for (const [key, value] of Object.entries(merged_lang)) {
@@ -25,12 +25,14 @@ i18n.merge_lang = function (merged_lang, lang) {
     }
   }
 
-  for (const [key, value] of Object.entries(lang)) {
-    if (!result_lang[key]) {
-      result_lang[key] = {};
-    }
-    for (const [tag, txt] of Object.entries(value)) {
-      result_lang[key][tag] = txt;
+  for (const lang of langs) {
+    for (const [key, value] of Object.entries(lang)) {
+      if (!result_lang[key]) {
+        result_lang[key] = {};
+      }
+      for (const [tag, txt] of Object.entries(value)) {
+        result_lang[key][tag] = txt;
+      }
     }
   }
 

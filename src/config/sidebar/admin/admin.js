@@ -10,7 +10,7 @@ let admin = [
     },
     children: [
       {
-        name: "User Manager",
+        name: "user_mgr",
         icon: UsersIcon,
         open: false,
         href: "/admin/user_mgr",
@@ -19,7 +19,7 @@ let admin = [
         },
       },
       {
-        name: "DBKV",
+        name: "dbkv",
         icon: ListBulletIcon,
         open: false,
         href: "/admin/kv_mgr",
