@@ -5,6 +5,9 @@ let admin = [
     name: "admin",
     icon: FolderIcon,
     open: true,
+    auth: function (user) {
+      return user.roles.includes("admin");
+    },
     children: [
       {
         name: "User Manager",

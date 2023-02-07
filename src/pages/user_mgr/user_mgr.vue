@@ -51,8 +51,8 @@ const colums = [
     type: "number",
   },
   {
-    label: "Action1",
-    field: "action1",
+    label: "Action",
+    field: "action",
   },
 ];
 
@@ -310,7 +310,7 @@ rt_mgr.loadItems();
           </template>
 
           <template #table-row="props">
-            <span v-if="props.column.field === 'action1'">
+            <span v-if="props.column.field === 'action'">
               <button type="button" @click="edit(props.row)" class="btn-secondary xs"><PencilSquareIcon class="prefix-icon" />Edit</button>
             </span>
 
@@ -321,6 +321,10 @@ rt_mgr.loadItems();
             <span v-else-if="props.column.field === 'forbidden'">
                 <span v-if="props.row[props.column.field]===true" class="badge err">forbidden</span>
                 <span v-else class="badge success">active</span>
+            </span>
+
+            <span v-else-if="props.column.field === 'roles'">
+                <span v-for="role in props.row[props.column.field]" class="badge secondary mr-1">{{ role }}</span>
             </span>
 
             <span v-else-if="props.column.field === 'created_unixtime'">
