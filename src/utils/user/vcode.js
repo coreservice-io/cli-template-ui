@@ -28,15 +28,15 @@ function NewVcodeMgr(id) {
     let resp = await api.user.getEmailVCode(email, captchaId, captcha);
     if (resp.err !== null) {
       toast.error(resp.err);
-      return;
+      return false;
     }
     if (resp.result.meta_status < 0) {
       toast.error(resp.result.meta_message);
-      return;
+      return false;
     }
 
     toast.success("success");
-      return;
+      return true;
   };
 
   ///////

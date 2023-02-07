@@ -57,12 +57,14 @@ async function submit_signin() {
   if (resp.err != null) {
     toast.error(resp.err);
     overlay_store.hideLoader();
+    captcha_mgr.refresh_captcha()
     return;
   }
 
   if (resp.result.meta_status < 0) {
     toast.error(resp.result.meta_message);
     overlay_store.hideLoader();
+    captcha_mgr.refresh_captcha()
     return;
   }
 

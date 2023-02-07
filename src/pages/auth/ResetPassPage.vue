@@ -51,12 +51,14 @@ let send_vcode_ready = computed(() => {
   }
 });
 let vcode_mgr = NewVcodeMgr("reset_password");
-let send_vcode = function () {
+let send_vcode = async function () {
   if (send_vcode_ready.value != true) {
     return;
   }
 
-  vcode_mgr.getEmailVCode(email.value, captcha_mgr.captchaId, captcha_mgr.captcha.value);
+  if (!await vcode_mgr.getEmailVCode(email.value, captcha_mgr.captchaId, captcha_mgr.captcha.value)){
+    captcha_mgr.refresh_captcha();
+  }
   vcode_mgr.resetLoader();
 };
 
@@ -83,12 +85,14 @@ async function submit_reset_pass() {
   if (resp.err != null) {
     toast.error(resp.err);
     overlay_store.hideLoader();
+    captcha_mgr.refresh_captcha()
     return;
   }
 
   if (resp.result.meta_status < 0) {
     toast.error(resp.result.meta_message);
     overlay_store.hideLoader();
+    captcha_mgr.refresh_captcha()
     return;
   }
 
