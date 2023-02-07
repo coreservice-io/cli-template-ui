@@ -108,8 +108,9 @@
         .footer__navigation__page-info__current-entry {
             @apply py-0.5;
             min-width: 80px;
-            font-family: initial;
-            font: initial;
+            font-family: inherit !important;
+            @apply font-medium;
+            @apply text-gray-400;
             @apply text-sm;
             @apply border-gray-200;
             @apply rounded-md;

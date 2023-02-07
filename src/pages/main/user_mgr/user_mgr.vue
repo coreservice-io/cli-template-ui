@@ -7,7 +7,7 @@ import { PencilSquareIcon, MagnifyingGlassIcon, PlusCircleIcon, ArrowPathIcon } 
 import { ref } from "vue";
 import { NewRemoteTableMgr } from "@/utils/table";
 import { useToast } from "vue-toastification";
-import SimpleSecondarySelect from "@/components/core/select/SingleSelect.vue";
+import SingleSelect from "@/components/core/select/SingleSelect.vue";
 import Treeselect from "vue3-treeselect";
 import api from "@/api";
 import useAuthStore from "@/stores/auth";
@@ -285,14 +285,14 @@ rt_mgr.loadItems();
 
                 <div class="lg:col-span-1 input-wrap sm">
                   <div class="lg:col-span-2 mt-2">
-                    <SimpleSecondarySelect
+                    <SingleSelect
                       :options="[
                         { name: 'All', value: null },
                         { name: 'Only forbidden user', value: true },
                         { name: 'Only active user', value: false },
                       ]"
                       v-model="search_condition.forbidden"
-                    ></SimpleSecondarySelect>
+                    ></SingleSelect>
                   </div>
                 </div>
               </div>
