@@ -87,7 +87,7 @@ async function submit_reset_pass() {
   }
 
   if (resp.result.meta_status < 0) {
-    toast.error(resp.result.meta_msg);
+    toast.error(resp.result.meta_message);
     overlay_store.hideLoader();
     return;
   }
