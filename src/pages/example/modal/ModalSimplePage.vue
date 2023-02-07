@@ -17,6 +17,8 @@ const child = ref(false);
 
 const info = ref(false);
 const warning = ref(false);
+
+const long_text = ref(false);
 </script>
 
 <template>
@@ -36,8 +38,13 @@ const warning = ref(false);
         <div class="lg:col-span-2 mt-2">
           <button class="btn-primary" @click="open_m_close = true">Open Modal Window</button>
           <Modal v-model:open="open_m_close" margin-close="true">
+
+            <template v-slot:header>
+              Title
+            </template>
+
             <template v-slot:body>
-              <div class="mt-5">
+              <div class="my-5">
                 <label>A disable close style modal</label>
                 <p>you can click buttons or dark space to close modal window</p>
               </div>
@@ -177,6 +184,26 @@ const warning = ref(false);
             <template v-slot:footer>
               <button type="button" class="btn-err mr-3" @click="warning = false">Deactivate</button>
               <button type="button" class="btn-secondary mr-3" @click="warning = false">Cancel</button>
+            </template>
+          </Modal>
+        </div>
+      </div>
+
+      <div class="pt-5 lg:grid lg:grid-cols-3 lg:gap-4">
+        <div>
+          <label for="username" class="flex">Modal with long text</label>
+        </div>
+        <div class="lg:col-span-2 mt-2">
+          <button class="btn-primary" @click="long_text = true">Open Modal long_text</button>
+          <Modal v-model:open="long_text" :disable-close="true">
+            <template v-slot:body>
+              <div class="mt-5">
+                <p v-for="index in 100">long text</p>
+              </div>
+            </template>
+            <template v-slot:footer>
+              <button type="button" class="btn-err mr-3" @click="long_text = false">Deactivate</button>
+              <button type="button" class="btn-secondary mr-3" @click="long_text = false">Cancel</button>
             </template>
           </Modal>
         </div>
