@@ -97,7 +97,7 @@ async function deleteRecord() {
     denyButtonText: "Delete",
   });
 
-  if (!result.idDenied) {
+  if (!result.isDenied) {
     return;
   }
 
