@@ -14,6 +14,9 @@ import useAuthStore from "@/stores/auth";
 import moment from "moment";
 import validator from "@/utils/validator.js";
 
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
+
 const auth_store = useAuthStore();
 const toast = useToast();
 
@@ -85,7 +88,7 @@ async function createUser() {
   }
 
   if (!validator.validatePassword(newUser.value.password)) {
-    toast.error("key error");
+    toast.error("password error," + t("password_rule"));
     return;
   }
 
@@ -374,7 +377,7 @@ rt_mgr.loadItems();
             </div>
           </template>
           <template v-slot:footer>
-            <button type="button" class="btn-secondary mr-3" @click="edit_m_open = false">Cancel</button>
+            <button type="button" class="btn-secondary mr-3" @click="create_open = false">Cancel</button>
             <button type="button" class="btn-primary mr-3" @click="createUser">Create</button>
           </template>
         </Modal>

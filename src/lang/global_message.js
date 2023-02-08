@@ -10,6 +10,7 @@ export default {
     close: "Close",
     or: "Or",
     send:"Send",
+    password_rule: "Password length should between 6-20 and must contain both character and number",
     
   },
   zh: {
@@ -20,5 +21,6 @@ export default {
     close: "关闭",
     or: "或",
     send:"发送",
+    password_rule: "密码长度在6到20之前,并且包含英文字符和数字",
   },
 };
