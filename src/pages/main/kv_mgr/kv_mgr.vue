@@ -187,6 +187,26 @@ async function search_fn() {
 /////////////////////////////////////////////
 //inital loading
 search_fn();
+
+////////table config///////
+let table_search_options = {
+  enabled: false,
+  placeholder: 'search table',
+}
+
+let table_pagination_options = {
+  enabled: true,
+  mode: 'records',
+  perPage: 10,
+  perPageDropdown: [10, 20, 50, 100],
+  setCurrentPage: 1,
+  dropdownAllowAll: false,
+}
+
+let table_select_options = {
+  enabled: false,
+  selectOnCheckboxOnly: true, // only select when checkbox is clicked instead of the row
+}
 </script>
 
 <template>
@@ -198,39 +218,26 @@ search_fn();
       </div>
 
       <div>
-        <vue-good-table
-          :search-options="{
-            enabled: false,
-            placeholder: 'search table',
-          }"
-          :pagination-options="{
-            enabled: true,
-            mode: 'records',
-            perPage: 10,
-            perPageDropdown: [10, 20, 50, 100],
-            setCurrentPage: 1,
-            dropdownAllowAll: false,
-          }"
-          :select-options="{
-            enabled: false,
-            selectOnCheckboxOnly: true, // only select when checkbox is clicked instead of the row
-          }"
-          :columns="columns"
-          :rows="rows"
-          v-on:selected-rows-change="onSelectedRows"
-        >
+        <vue-good-table v-on:selected-rows-change="onSelectedRows" :search-options="table_search_options"
+          :pagination-options="table_pagination_options" :select-options="table_select_options" :columns="columns" :rows="rows">
           <template #selected-row-actions>
             <button class="btn-primary sm">selection Action 1</button>
           </template>
 
           <template #table-actions>
-            <button type="button" @click="create_open = true" class="btn-primary sm mr-3"><PlusCircleIcon class="prefix-icon" />Add Key</button>
-            <button type="button" @click="search_fn" class="btn-secondary sm mr-3"><ArrowPathIcon class="prefix-icon" />Refresh</button>
+            <button type="button" @click="create_open = true" class="btn-primary sm mr-3">
+              <PlusCircleIcon class="prefix-icon" />Add Key
+            </button>
+            <button type="button" @click="search_fn" class="btn-secondary sm mr-3">
+              <ArrowPathIcon class="prefix-icon" />Refresh
+            </button>
           </template>
 
           <template #table-row="props">
             <span v-if="props.column.field === 'action'">
-              <button type="button" @click="edit(props.row)" class="btn-secondary xs"><PencilSquareIcon class="prefix-icon" />Edit/Delete</button>
+              <button type="button" @click="edit(props.row)" class="btn-secondary xs">
+                <PencilSquareIcon class="prefix-icon" />Edit/Delete
+              </button>
             </span>
 
             <!-- Column: Common -->
@@ -280,5 +287,5 @@ search_fn();
         </Modal>
       </div>
     </div>
-  </SidebarLayout>
+</SidebarLayout>
 </template>

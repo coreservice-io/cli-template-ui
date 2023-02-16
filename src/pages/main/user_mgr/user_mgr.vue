@@ -244,6 +244,24 @@ async function search_fn() {
 /////////////////////////////////////////////
 //inital loading
 rt_mgr.loadItems();
+
+
+////////table config///////
+let table_pagination_options = {
+  enabled: true,
+  mode: 'pages',
+  perPage: rt_mgr.per_page,
+  perPageDropdown: [10, 20, 50, 100],
+  setCurrentPage: rt_mgr.page,
+  dropdownAllowAll: false,
+}
+
+let table_select_options = {
+  enabled: false,
+  selectOnCheckboxOnly: true, // only select when checkbox is clicked instead of the row
+}
+
+
 </script>
 
 <template>
@@ -255,38 +273,25 @@ rt_mgr.loadItems();
       </div>
 
       <div>
-        <vue-good-table
-          :pagination-options="{
-            enabled: true,
-            mode: 'pages',
-            perPage: rt_mgr.per_page,
-            perPageDropdown: [10, 20, 50, 100],
-            setCurrentPage: rt_mgr.page,
-            dropdownAllowAll: false,
-          }"
-          :select-options="{
-            enabled: false,
-            selectOnCheckboxOnly: true, // only select when checkbox is clicked instead of the row
-          }"
-          :columns="rt_mgr.columns"
-          :rows="rt_mgr.rows.value"
-          :totalRows="rt_mgr.totalRecords.value"
-          mode="remote"
-          :isLoading.sync="rt_mgr.isLoading.value"
-          v-on:page-change="rt_mgr.onPageChange"
-          v-on:sort-change="rt_mgr.onSortChange"
-          v-on:column-filter="rt_mgr.onColumnFilter"
-          v-on:per-page-change="rt_mgr.onPerPageChange"
-          v-on:selected-rows-change="onSelectedRows"
-        >
+        <vue-good-table v-on:selected-rows-change="onSelectedRows" :pagination-options="table_pagination_options"
+          :select-options="table_select_options" :columns="rt_mgr.columns" :rows="rt_mgr.rows.value"
+          :totalRows="rt_mgr.totalRecords.value" mode="remote" :isLoading.sync="rt_mgr.isLoading.value"
+          v-on:page-change="rt_mgr.onPageChange" v-on:sort-change="rt_mgr.onSortChange"
+          v-on:column-filter="rt_mgr.onColumnFilter" v-on:per-page-change="rt_mgr.onPerPageChange">
           <template #selected-row-actions>
             <button class="btn-primary sm">selection Action 1</button>
           </template>
 
           <template #table-actions>
-            <button type="button" @click="create_open = true" class="btn-primary sm mr-3"><PlusCircleIcon class="prefix-icon" />New user</button>
-            <button type="button" @click="rt_mgr.loadItems" class="btn-secondary sm mr-3"><ArrowPathIcon class="prefix-icon" />Refresh</button>
-            <button type="button" @click="search_open = !search_open" class="btn-secondary sm"><MagnifyingGlassIcon class="prefix-icon" />Open Search</button>
+            <button type="button" @click="create_open = true" class="btn-primary sm mr-3">
+              <PlusCircleIcon class="prefix-icon" />New user
+            </button>
+            <button type="button" @click="rt_mgr.loadItems" class="btn-secondary sm mr-3">
+              <ArrowPathIcon class="prefix-icon" />Refresh
+            </button>
+            <button type="button" @click="search_open = !search_open" class="btn-secondary sm">
+              <MagnifyingGlassIcon class="prefix-icon" />Open Search
+            </button>
 
             <div v-if="search_open" class="p-3 mt-1 bg-white border-1 border rounded">
               <div class="pt-3 grid lg:grid-cols-3 gap-2 md:gap-4">
@@ -307,14 +312,11 @@ rt_mgr.loadItems();
 
                 <div class="lg:col-span-1 input-wrap sm">
                   <div class="lg:col-span-2 mt-2">
-                    <SingleSelect
-                      :options="[
-                        { name: 'All', value: null },
-                        { name: 'Only forbidden user', value: true },
-                        { name: 'Only active user', value: false },
-                      ]"
-                      v-model="search_condition.forbidden"
-                    ></SingleSelect>
+                    <SingleSelect :options="[
+                      { name: 'All', value: null },
+                      { name: 'Only forbidden user', value: true },
+                      { name: 'Only active user', value: false },
+                    ]" v-model="search_condition.forbidden"></SingleSelect>
                   </div>
                 </div>
               </div>
@@ -326,7 +328,9 @@ rt_mgr.loadItems();
 
           <template #table-row="props">
             <span v-if="props.column.field === 'action'">
-              <button type="button" @click="edit(props.row)" class="btn-secondary xs"><PencilSquareIcon class="prefix-icon" />Edit</button>
+              <button type="button" @click="edit(props.row)" class="btn-secondary xs">
+                <PencilSquareIcon class="prefix-icon" />Edit
+              </button>
             </span>
 
             <span v-else-if="props.column.field === 'email'">
@@ -351,7 +355,8 @@ rt_mgr.loadItems();
               {{ moment.unix(props.row[props.column.field]).utc().format("YYYY-MM-DD HH:mm:ss") }}
             </span>
 
-            <ProgressBar class="sm" v-else-if="props.column.field === 'score'" tippy="score:" :percent="props.row[props.column.field]" />
+            <ProgressBar class="sm" v-else-if="props.column.field === 'score'" tippy="score:"
+              :percent="props.row[props.column.field]" />
             <!-- Column: Common -->
             <span v-else>{{ props.row[props.column.field] }}</span>
           </template>
@@ -362,14 +367,17 @@ rt_mgr.loadItems();
           <template v-slot:body>
             <div class="my-2">
               <p>Email</p>
-              <input type="email" v-model="rt_mgr.currentRowData.value.email" class="sm:col-span-3 mt-1 rounded disabled" disabled="" />
+              <input type="email" v-model="rt_mgr.currentRowData.value.email" class="sm:col-span-3 mt-1 rounded disabled"
+                disabled="" />
               <p class="mt-4">Roles</p>
               <div class="lg:col-span-2 mt-2">
-                <treeselect v-model="rt_mgr.currentRowData.value.roles" :multiple="true" :options="roleOptions" :load-options="loadOptions" />
+                <treeselect v-model="rt_mgr.currentRowData.value.roles" :multiple="true" :options="roleOptions"
+                  :load-options="loadOptions" />
               </div>
               <p class="mt-5">Forbidden</p>
               <div>
-                <label class="mr-1 mt-2"><input type="checkbox" v-model="rt_mgr.currentRowData.value.forbidden" class="mr-2" />forbidden</label>
+                <label class="mr-1 mt-2"><input type="checkbox" v-model="rt_mgr.currentRowData.value.forbidden"
+                    class="mr-2" />forbidden</label>
               </div>
             </div>
           </template>
@@ -402,5 +410,5 @@ rt_mgr.loadItems();
         </Modal>
       </div>
     </div>
-  </SidebarLayout>
+</SidebarLayout>
 </template>
