@@ -9,6 +9,8 @@ import { NewRemoteTableMgr } from "@/utils/table";
 import { useToast } from "vue-toastification";
 import SingleSelect from "@/components/core/select/SingleSelect.vue";
 import Treeselect from "vue3-treeselect";
+import { LOAD_ROOT_OPTIONS } from "vue3-treeselect";
+
 import api from "@/api";
 import useAuthStore from "@/stores/auth";
 import moment from "moment";
@@ -177,10 +179,29 @@ function reset_search_condition() {
   };
 }
 
-const roleOptions = ["admin", "read_only", "user"].map((id) => ({
-  id,
-  label: `${id}`,
-}));
+/////////////////////
+let roleOptions = ref(null);
+async function loadOptions({ action /*, callback*/ }) {
+  if (action === LOAD_ROOT_OPTIONS) {
+    // request api
+    let resp = await api.user.auth_config();
+
+    if (resp.err !== null) {
+      throw new Error("Failed to load options");
+    }
+
+    if (resp.result.meta_status < 0) {
+      throw new Error("Failed to load options,err:" + resp.result.meta_message);
+    }
+
+    roleOptions.value = resp.result.roles.map((id) => ({
+      id,
+      label: `${id}`,
+    }));
+  }
+}
+/////////////////////
+
 /////////////////////////////////////////////
 async function search_fn() {
   let id = null;
@@ -218,9 +239,6 @@ async function search_fn() {
     toast.error(resp.result.meta_message);
     return;
   }
-
-  //console.log(resp.result)
-
   return resp.result;
 }
 /////////////////////////////////////////////
@@ -347,7 +365,7 @@ rt_mgr.loadItems();
               <input type="email" v-model="rt_mgr.currentRowData.value.email" class="sm:col-span-3 mt-1 rounded disabled" disabled="" />
               <p class="mt-4">Roles</p>
               <div class="lg:col-span-2 mt-2">
-                <treeselect v-model="rt_mgr.currentRowData.value.roles" :multiple="true" :options="roleOptions" />
+                <treeselect v-model="rt_mgr.currentRowData.value.roles" :multiple="true" :options="roleOptions" :load-options="loadOptions" />
               </div>
               <p class="mt-5">Forbidden</p>
               <div>
@@ -373,7 +391,7 @@ rt_mgr.loadItems();
 
               <p class="mt-3">Roles</p>
               <div class="lg:col-span-2 mt-2">
-                <treeselect v-model="newUser.roles" :multiple="true" :options="roleOptions" />
+                <treeselect v-model="newUser.roles" :multiple="true" :options="roleOptions" :load-options="loadOptions" />
               </div>
             </div>
           </template>

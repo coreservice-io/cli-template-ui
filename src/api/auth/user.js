@@ -4,6 +4,12 @@ import request from "../request";
 
 import config from "@/config/config.js";
 
+
+async function auth_config() {
+  let url = config.api.endpoint + "/api/user/auth_config";
+  return await request.Get(url);
+}
+
 async function login(email, password, captchaId, captcha) {
   let url = config.api.endpoint + "/api/user/login";
   return await request.Post(url, {
@@ -105,6 +111,7 @@ async function createUser(email, password,roles, permissions, token) {
 /////////////////////////////////////////////////////////////
 
 export default {
+  auth_config,
   login,
   register,
   resetPassword,
