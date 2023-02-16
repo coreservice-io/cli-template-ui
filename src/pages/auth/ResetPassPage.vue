@@ -56,10 +56,12 @@ let send_vcode = async function () {
     return;
   }
 
+  vcode_mgr.resetLoader();
+
   if (!await vcode_mgr.getEmailVCode(email.value, captcha_mgr.captchaId, captcha_mgr.captcha.value)){
     captcha_mgr.refresh_captcha();
   }
-  vcode_mgr.resetLoader();
+  
 };
 
 //
@@ -75,9 +77,7 @@ async function submit_reset_pass() {
   if (!validate_reset_pass_ready.value) {
     return;
   }
-
-  //console.log("submit_reset_pass", [email.value, password.value, vcode_mgr.vcode.value]);
-
+ 
   const overlay_store = useOverlayStore();
   overlay_store.showLoader();
   let resp = await api.user.resetPassword(email.value, password.value, vcode_mgr.vcode.value);
