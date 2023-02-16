@@ -137,12 +137,13 @@ async function submitUpdate() {
 
   if (resp.err !== null) {
     toast.error(resp.err);
+    edit_m_loader_open.value = false;
     return;
   }
 
   if (resp.result.meta_status < 0) {
-    //todo  resp.result.meta_status => error msg
     toast.error(resp.result.meta_message);
+    edit_m_loader_open.value = false;
     return;
   }
 

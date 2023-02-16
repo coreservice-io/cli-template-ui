@@ -52,7 +52,7 @@ async function getEmailVCode(email, captchaId, captcha) {
 }
 
 async function queryUser(userId, emailPattern,userToken, forbidden, limit, offset, token) {
-  let url = config.api.endpoint + "/api/user/query";
+  let url = config.api.endpoint + "/api/user/admin/query";
   return await request.Post(
       url,
       {
@@ -71,7 +71,7 @@ async function queryUser(userId, emailPattern,userToken, forbidden, limit, offse
 
 
 async function updateUser(id, forbidden, roles, permissions, token) {
-  let url = config.api.endpoint + "/api/user/update";
+  let url = config.api.endpoint + "/api/user/admin/update";
   return await request.Post(
       url,
       {
@@ -89,7 +89,7 @@ async function updateUser(id, forbidden, roles, permissions, token) {
 }   
 
 async function createUser(email, password,roles, permissions, token) {
-  let url = config.api.endpoint + "/api/user/create";
+  let url = config.api.endpoint + "/api/user/admin/create";
   return await request.Post(
       url,
       {
