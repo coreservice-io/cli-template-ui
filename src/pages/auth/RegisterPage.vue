@@ -58,10 +58,11 @@ let send_vcode = async function () {
     return;
   }
 
+  vcode_mgr.resetLoader();
+
   if (!await vcode_mgr.getEmailVCode(email.value, captcha_mgr.captchaId, captcha_mgr.captcha.value)){
     captcha_mgr.refresh_captcha();
   }
-  vcode_mgr.resetLoader();
 };
 
 ///////
