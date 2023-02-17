@@ -150,10 +150,10 @@ async function submit_reg() {
           <div class="prefix">
             <CalculatorIcon class="icon" />
           </div>
-          <input type="text" v-model="captcha_mgr.captcha.value" class="pl-10" :placeholder="t('input_captcha')" />
+          <input type="text" v-model="captcha_mgr.captcha.value" class="pl-10 rounded-l" :placeholder="t('input_captcha')" />
         </div>
 
-        <div class="btn" v-tippy="{ placement: 'bottom', content: t('change_captcha') }" @click="captcha_mgr.refresh_captcha">
+        <div class="btn rounded-r" v-tippy="{ placement: 'bottom', content: t('change_captcha') }" @click="captcha_mgr.refresh_captcha">
           <img v-if="captcha_mgr.captchaBase64.value !== ''" class="captcha" :src="captcha_mgr.captchaBase64.value" />
           <p v-else><ArrowPathIcon />loading.......</p>
         </div>
@@ -164,13 +164,13 @@ async function submit_reg() {
           <div class="prefix">
             <KeyIcon class="icon" />
           </div>
-          <input type="text" name="vcode" id="vcode" v-model="vcode_mgr.vcode.value" class="pl-10" placeholder="input your v-code" />
+          <input type="text" name="vcode" id="vcode" v-model="vcode_mgr.vcode.value" class="pl-10 rounded-l" placeholder="input your v-code" />
         </div>
 
-        <div v-if="vcode_mgr.loader_secs.value == 0" :class="[send_vcode_ready ? '' : 'disabled', 'btn']" class="btn" v-tippy="{ placement: 'bottom', content: send_vcode_ready ? t('send_vcode_to_email') : t('complete_vcode_to_email') }" @click="send_vcode">
+        <div v-if="vcode_mgr.loader_secs.value == 0" :class="[send_vcode_ready ? '' : 'disabled', 'btn']" class="btn rounded-r" v-tippy="{ placement: 'bottom', content: send_vcode_ready ? t('send_vcode_to_email') : t('complete_vcode_to_email') }" @click="send_vcode">
           <PaperAirplaneIcon /><span>{{ t("send") }}</span>
         </div>
-        <div v-if="vcode_mgr.loader_secs.value != 0" class="btn">
+        <div v-if="vcode_mgr.loader_secs.value != 0" class="btn rounded-r">
           <ArrowPathIcon /><span>{{ vcode_mgr.loader_secs.value }}(s)</span>
         </div>
       </div>

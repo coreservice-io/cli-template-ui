@@ -154,9 +154,7 @@ input.err {
         @apply inline-flex;
 
         input {
-            @apply w-full;
-            @apply rounded-none;
-            @apply rounded-l-md;
+            @apply w-full;         
         }
     }
 
@@ -166,7 +164,6 @@ input.err {
         @apply border-gray-300;
         @apply bg-gray-50;
         @apply -ml-px;
-        @apply rounded-r;
         @apply text-gray-700;
         @apply px-4;
         @apply whitespace-nowrap;
