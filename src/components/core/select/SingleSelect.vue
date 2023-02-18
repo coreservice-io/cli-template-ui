@@ -11,7 +11,11 @@ const selected = ref(props.modelValue);
 
 const emit = defineEmits(["update:modelValue"]);
 watch(selected, (new_selected) => {
-  emit("update:modelValue", new_selected);
+  if (new_selected!=null&& typeof new_selected.value!=undefined){
+    emit("update:modelValue", new_selected.value);
+  }else{
+    emit("update:modelValue", null);
+  }
 });
 </script>
 
