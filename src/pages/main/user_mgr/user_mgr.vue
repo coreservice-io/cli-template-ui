@@ -381,7 +381,7 @@ let table_select_options = {
             </div>
           </template>
           <template v-slot:footer>
-            <button type="button" class="btn-secondary mr-3" @click="edit_m_open = false">Cancel</button>
+            <button type="button" class="btn-secondary" @click="edit_m_open = false">Cancel</button>
             <button type="button" class="btn-primary mr-3" @click="submitUpdate">Update</button>
           </template>
         </Modal>
@@ -403,7 +403,7 @@ let table_select_options = {
             </div>
           </template>
           <template v-slot:footer>
-            <button type="button" class="btn-secondary mr-3" @click="create_open = false">Cancel</button>
+            <button type="button" class="btn-secondary" @click="create_open = false">Cancel</button>
             <button type="button" class="btn-primary mr-3" @click="createUser">Create</button>
           </template>
         </Modal>
