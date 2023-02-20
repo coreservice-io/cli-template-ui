@@ -9,7 +9,7 @@ function NewRemoteTableMgr(colums, query_server_fn) {
   rt_mgr.currentRowData = ref(null);
 
   rt_mgr.setCurrentRowData = function (row) {
-    rt_mgr.currentRowData.value = Object.assign({}, row);
+    rt_mgr.currentRowData.value = JSON.parse(JSON.stringify(row))
   };
   ///////////////////
   rt_mgr.columns = colums;
