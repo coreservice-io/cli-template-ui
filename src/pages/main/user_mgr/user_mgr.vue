@@ -313,7 +313,6 @@ let table_select_options = {
                 <div class="lg:col-span-1 input-wrap sm">
                   <div class="lg:col-span-2 mt-2">
                     <SingleSelect :options="[
-                      { name: 'All', value: null },
                       { name: 'Only forbidden user', value: true },
                       { name: 'Only active user', value: false },
                     ]" v-model="search_condition.forbidden"></SingleSelect>
@@ -410,5 +409,5 @@ let table_select_options = {
         </Modal>
       </div>
     </div>
-</SidebarLayout>
+  </SidebarLayout>
 </template>
