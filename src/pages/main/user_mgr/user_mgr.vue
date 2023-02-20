@@ -82,7 +82,7 @@ const newUser = ref({
 });
 
 async function createUser() {
-  console.log("submitcreate");
+  //console.log("submitcreate");
 
   if (!validator.validateEmail(newUser.value.email)) {
     toast.error("email error");
@@ -130,7 +130,7 @@ function edit(row) {
   edit_m_open.value = true;
 }
 async function submitUpdate() {
-  console.log("submitupdate");
+  //console.log("submitupdate");
   edit_m_loader_open.value = true;
 
   //simulate remote submit
@@ -157,7 +157,7 @@ async function submitUpdate() {
 
 //selection
 function onSelectedRows(params) {
-  console.log(params.selectedRows.length);
+  //console.log(params.selectedRows.length);
 }
 
 ///search/////
