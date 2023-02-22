@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed } from "vue";
+import { ref, watch, computed,toRef } from "vue";
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/vue";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/vue/20/solid";
 
@@ -17,6 +17,11 @@ props.options.forEach(element => {
 })
 
 const selected = ref(props.modelValue);
+
+const prop_selected=  toRef(props,'modelValue')
+watch(prop_selected, (new_prop_selected) => {
+  selected.value=new_prop_selected
+});
 
 const emit = defineEmits(["update:modelValue"]);
 watch(selected, (new_selected) => {

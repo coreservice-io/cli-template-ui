@@ -1,11 +1,11 @@
 <script setup>
 import SidebarLayout from "@/layouts/sidebar/SidebarLayout.vue";
 
-import { VueGoodTable } from "vue-good-table-next";
+
 import Modal from "@/components/core/modal/Modal.vue";
 import { PencilSquareIcon, MagnifyingGlassIcon, PlusCircleIcon, ArrowPathIcon } from "@heroicons/vue/24/outline";
-import { ref } from "vue";
-import { NewRemoteTableMgr } from "@/utils/table";
+import { ref,toRaw } from "vue";
+
 import { useToast } from "vue-toastification";
 import SingleSelect from "@/components/core/select/SingleSelect.vue";
 import Treeselect from "vue3-treeselect";
@@ -15,6 +15,10 @@ import api from "@/api";
 import useAuthStore from "@/stores/auth";
 import moment from "moment";
 import validator from "@/utils/validator.js";
+
+import GoodTable from "@/components/core/table/Table.vue";
+import { NewTableMgr } from "@/components/core/table/table.js";
+
 
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
@@ -66,117 +70,22 @@ const colums = [
   },
 ];
 
-////
-let rt_mgr = NewRemoteTableMgr(colums, search_fn);
 
-//crete
-const create_open = ref(false);
-const create_loader_open = ref(false);
+///////////search///////////////////////
 
-/////////////////////////////////////////////
-const newUser = ref({
-  email: "",
-  password: "",
-  roles: [],
-  permissions: [],
-});
-
-async function createUser() {
-  //console.log("submitcreate");
-
-  if (!validator.validateEmail(newUser.value.email)) {
-    toast.error("email error");
-    return;
-  }
-
-  if (!validator.validatePassword(newUser.value.password)) {
-    toast.error("password error," + t("password_rule"));
-    return;
-  }
-
-  create_loader_open.value = true;
-
-  //simulate remote submit
-  //request api
-  let resp = await api.user.createUser(newUser.value.email, newUser.value.password, newUser.value.roles, newUser.value.permissions, auth_store.token);
-  if (resp.err !== null) {
-    toast.error(resp.err);
-    return;
-  }
-
-  if (resp.result.meta_status < 0) {
-    //todo  resp.result.meta_status => error msg
-    toast.error(resp.result.meta_message);
-    return;
-  }
-
-  toast.success("create success");
-  newUser.value = {
-    email: "",
-    password: "",
-    roles: [],
-    permissions: [],
-  };
-  create_open.value = false;
-  create_loader_open.value = false;
-  rt_mgr.loadItems(); //reload table after success
-}
-
-///edit
-const edit_m_open = ref(false);
-const edit_m_loader_open = ref(false);
-function edit(row) {
-  rt_mgr.setCurrentRowData(row);
-  edit_m_open.value = true;
-}
-async function submitUpdate() {
-  //console.log("submitupdate");
-  edit_m_loader_open.value = true;
-
-  //simulate remote submit
-  //request api
-  let resp = await api.user.updateUser(rt_mgr.currentRowData.value.id, rt_mgr.currentRowData.value.forbidden, rt_mgr.currentRowData.value.roles, rt_mgr.currentRowData.value.permissions, auth_store.token);
-
-  if (resp.err !== null) {
-    toast.error(resp.err);
-    edit_m_loader_open.value = false;
-    return;
-  }
-
-  if (resp.result.meta_status < 0) {
-    toast.error(resp.result.meta_message);
-    edit_m_loader_open.value = false;
-    return;
-  }
-
-  toast.success("update success");
-  edit_m_open.value = false;
-  edit_m_loader_open.value = false;
-  rt_mgr.loadItems(); //reload table after success
-}
-
-//selection
-function onSelectedRows(params) {
-  //console.log(params.selectedRows.length);
-}
-
-///search/////
-const search_open = ref(false);
-//
-const search_condition = ref({
-  id: null,
-  email_pattern: null,
-  token: null,
-  forbidden: null,
-});
-
-function reset_search_condition() {
-  search_condition.value = {
+function initSearchCondition() {
+  return {
     id: null,
     email_pattern: null,
     token: null,
     forbidden: null,
-  };
+  }
+}
+
+const search_condition = ref(initSearchCondition());
+
+function ResetSearch() {
+  search_condition.value = initSearchCondition();
 }
 
 /////////////////////
@@ -200,34 +109,30 @@ async function loadOptions({ action /*, callback*/ }) {
     }));
   }
 }
-/////////////////////
 
-/////////////////////////////////////////////
-async function search_fn() {
+async function searchFn(tableMgr) {
+ 
+  let search_params=toRaw(search_condition.value)
+
   let id = null;
-  if (search_condition.value.id !== null && search_condition.value.id !== "") {
-    id = parseInt(search_condition.value.id.trim());
+  if (search_params.id !== null && search_params.id.trim() !== "") {
+    id = parseInt(search_params.id.trim());
   }
 
   let email_pattern = null;
-  if (search_condition.value.email_pattern !== null && search_condition.value.email_pattern !== "") {
-    email_pattern = search_condition.value.email_pattern.trim();
+  if (search_params.email_pattern !== null && search_params.email_pattern.trim() !== "") {
+    email_pattern = search_params.email_pattern.trim();
   }
 
   let token = null;
-  if (search_condition.value.token !== null && search_condition.value.token != "") {
-    token = search_condition.value.token.trim();
+  if (search_params.token !== null && search_params.token.trim() != "") {
+    token =  search_params.token.trim();
   }
 
-  let forbidden = null;
-  if (search_condition.value.forbidden !== null) {
-    forbidden = search_condition.value.forbidden.value;
-  }
-
-  let { limit, offset } = rt_mgr.getLimitOffset();
+  let { limit, offset } = tableMgr.getLimitOffset();
 
   // request api
-  let resp = await api.user.queryUser(id, email_pattern, token, forbidden, limit, offset, auth_store.token);
+  let resp = await api.user.queryUser(id, email_pattern, token, search_params.forbidden, limit, offset, auth_store.token);
 
   if (resp.err !== null) {
     toast.error(resp.err);
@@ -241,26 +146,103 @@ async function search_fn() {
   }
   return resp.result;
 }
-/////////////////////////////////////////////
-//inital loading
-rt_mgr.loadItems();
 
+///////////end of search///////////////////////
+
+///////////create///////////////////////
+
+function initNewItem() {
+  return {
+    email: "",
+    password: "",
+    roles: [],
+    permissions: [],
+  }
+}
+
+const newItem = ref(initNewItem());
+
+function resetNewItem() {
+  newItem.value = initNewItem()
+}
+
+async function createSubmit(tableMgr) {
+
+  if (!validator.validateEmail(newItem.value.email)) {
+    toast.error("email error");
+    return false;
+  }
+
+  if (!validator.validatePassword(newItem.value.password)) {
+    toast.error("password error," + t("password_rule"));
+    return false;
+  }
+
+  //request api
+  let resp = await api.user.createUser(newItem.value.email, newItem.value.password, newItem.value.roles, newItem.value.permissions, auth_store.token);
+  if (resp.err !== null) {
+    toast.error(resp.err);
+    return false;
+  }
+
+  if (resp.result.meta_status < 0) {
+    toast.error(resp.result.meta_message);
+    return false;
+  }
+
+  toast.success("create success");
+  resetNewItem()
+  return true;
+}
+
+///////////end of create///////////////////////
+
+////////////update////////////
+
+async function updateDelete() {
+  return false
+}
+
+async function updateSubmit(tableMgr) {
+
+  let resp = await api.user.updateUser(tableMgr.currentRowData.value.id, tableMgr.currentRowData.value.forbidden, tableMgr.currentRowData.value.roles, tableMgr.currentRowData.value.permissions, auth_store.token);
+  if (resp.err !== null) {
+    toast.error(resp.err);
+    return false;
+  }
+
+  if (resp.result.meta_status < 0) {
+    toast.error(resp.result.meta_message);
+    return false;
+  }
+
+  toast.success("update success");
+  return true;
+}
+
+/////////////// end of update /////////////////////////////////////
 
 ////////table config///////
-let table_pagination_options = {
-  enabled: true,
-  mode: 'pages',
-  perPage: rt_mgr.per_page,
-  perPageDropdown: [10, 20, 50, 100],
-  setCurrentPage: rt_mgr.page,
-  dropdownAllowAll: false,
+let table_config = {
+  mode: 'remote',
 }
 
-let table_select_options = {
-  enabled: false,
-  selectOnCheckboxOnly: true, // only select when checkbox is clicked instead of the row
+let table_callback = {
+    searchFn: searchFn,
+    createSubmit: createSubmit,
+    updateDelete: updateDelete,
+    updateSubmit: updateSubmit,
 }
 
+let { tableMgr, currentRow,
+  update_w_open, update_w_loader_open,
+  create_w_open, create_w_loader_open } = NewTableMgr(table_config, colums, table_callback);
+
+/////////////////////////////////////////////
+//inital loading
+tableMgr.loadItems();
+
+/////////////////////////////////////////////
 
 </script>
 
@@ -273,61 +255,60 @@ let table_select_options = {
       </div>
 
       <div>
-        <vue-good-table v-on:selected-rows-change="onSelectedRows" :pagination-options="table_pagination_options"
-          :select-options="table_select_options" :columns="rt_mgr.columns" :rows="rt_mgr.rows.value"
-          :totalRows="rt_mgr.totalRecords.value" mode="remote" :isLoading.sync="rt_mgr.isLoading.value"
-          v-on:page-change="rt_mgr.onPageChange" v-on:sort-change="rt_mgr.onSortChange"
-          v-on:column-filter="rt_mgr.onColumnFilter" v-on:per-page-change="rt_mgr.onPerPageChange">
+        <good-table :table-mgr="tableMgr">
+
           <template #selected-row-actions>
             <button class="btn-primary sm">selection Action 1</button>
           </template>
 
           <template #table-actions>
-            <button type="button" @click="create_open = true" class="btn-primary sm mr-3">
+            <button type="button" @click="tableMgr.OpenCreateWindow" class="btn-primary sm mr-3">
               <PlusCircleIcon class="prefix-icon" />New user
             </button>
-            <button type="button" @click="rt_mgr.loadItems" class="btn-secondary sm mr-3">
+            <button type="button" @click="tableMgr.loadItems" class="btn-secondary sm mr-3">
               <ArrowPathIcon class="prefix-icon" />Refresh
             </button>
-            <button type="button" @click="search_open = !search_open" class="btn-secondary sm">
+            <button type="button" @click="tableMgr.toggleSearchWindow" class="btn-secondary sm">
               <MagnifyingGlassIcon class="prefix-icon" />Open Search
             </button>
+          </template>
 
-            <div v-if="search_open" class="p-3 mt-1 bg-white border-1 border rounded">
-              <div class="pt-3 grid lg:grid-cols-3 gap-2 md:gap-4">
-                <div class="lg:col-span-1 input-wrap sm">
-                  <div class="prefix">Id</div>
-                  <input type="text" v-model="search_condition.id" class="rounded pl-15" />
-                </div>
-
-                <div class="lg:col-span-1 input-wrap sm">
-                  <div class="prefix">Email pattern</div>
-                  <input type="text" v-model="search_condition.email_pattern" class="rounded pl-28" />
-                </div>
-
-                <div class="lg:col-span-1 input-wrap sm">
-                  <div class="prefix">Token</div>
-                  <input type="text" v-model="search_condition.token" class="rounded pl-15" />
-                </div>
-
-                <div class="lg:col-span-1 input-wrap sm">
-                  <div class="lg:col-span-2 mt-2">
-                    <SingleSelect :options="[
-                      { name: 'Only forbidden user', value: true },
-                      { name: 'Only active user', value: false },
-                    ]" v-model="search_condition.forbidden"></SingleSelect>
-                  </div>
-                </div>
+          <template #search-window>
+            <div class="pt-3 grid lg:grid-cols-3 gap-2 md:gap-4">
+              <div class="lg:col-span-1 input-wrap sm">
+                <div class="prefix">Id</div>
+                <input type="text" v-model="search_condition.id" class="rounded pl-15" />
               </div>
 
-              <div class="btn btn-secondary mt-3 sm" @click="rt_mgr.loadItems">Search</div>
-              <div class="btn btn-secondary mt-3 ml-3 sm" @click="reset_search_condition">Reset</div>
+              <div class="lg:col-span-1 input-wrap sm">
+                <div class="prefix">Email pattern</div>
+                <input type="text" v-model="search_condition.email_pattern" class="rounded pl-28" />
+              </div>
+
+              <div class="lg:col-span-1 input-wrap sm">
+                <div class="prefix">Token</div>
+                <input type="text" v-model="search_condition.token" class="rounded pl-15" />
+              </div>
+
+              <div class="lg:col-span-1 input-wrap sm">
+                <div class="lg:col-span-2 mt-2">
+                  <SingleSelect :options="[
+                    { name: 'Only forbidden user', value: true },
+                    { name: 'Only active user', value: false },
+                  ]" v-model="search_condition.forbidden"></SingleSelect>
+                </div>
+              </div>
             </div>
+
+            <div class="btn btn-secondary mt-3 sm" @click="tableMgr.loadItems">Search</div>
+            <div class="btn btn-secondary mt-3 ml-3 sm" @click="ResetSearch">Reset</div>
           </template>
+
+
 
           <template #table-row="props">
             <span v-if="props.column.field === 'action'">
-              <button type="button" @click="edit(props.row)" class="btn-secondary xs">
+              <button type="button" @click="tableMgr.OpenUpdateWindow(props.row)" class="btn-secondary xs">
                 <PencilSquareIcon class="prefix-icon" />Edit
               </button>
             </span>
@@ -359,54 +340,54 @@ let table_select_options = {
             <!-- Column: Common -->
             <span v-else>{{ props.row[props.column.field] }}</span>
           </template>
-        </vue-good-table>
+        </good-table>
 
-        <Modal v-model:open="edit_m_open" v-model:showLoader="edit_m_loader_open">
+        <Modal v-model:open="update_w_open" v-model:showLoader="update_w_loader_open">
           <template v-slot:header>Edit</template>
           <template v-slot:body>
             <div class="my-2">
               <p>Email</p>
-              <input type="email" v-model="rt_mgr.currentRowData.value.email" class="sm:col-span-3 mt-1 rounded disabled"
-                disabled="" />
+              <input type="email" v-model="currentRow.email" class="sm:col-span-3 mt-1 rounded disabled" disabled="" />
               <p class="mt-4">Roles</p>
               <div class="lg:col-span-2 mt-2">
-                <treeselect v-model="rt_mgr.currentRowData.value.roles" :multiple="true" :options="roleOptions"
+                <treeselect v-model="currentRow.roles" :multiple="true" :options="roleOptions"
                   :load-options="loadOptions" />
               </div>
               <p class="mt-5">Forbidden</p>
               <div>
-                <label class="mr-1 mt-2"><input type="checkbox" v-model="rt_mgr.currentRowData.value.forbidden"
+                <label class="mr-1 mt-2"><input type="checkbox" v-model="currentRow.forbidden"
                     class="mr-2" />forbidden</label>
               </div>
             </div>
           </template>
           <template v-slot:footer>
-            <button type="button" class="btn-secondary" @click="edit_m_open = false">Cancel</button>
-            <button type="button" class="btn-primary mr-3" @click="submitUpdate">Update</button>
+            <button type="button" class="btn-secondary" @click="tableMgr.CloseUpdateWindow">Cancel</button>
+            <button type="button" class="btn-primary mr-3" @click="tableMgr.Update">Update</button>
           </template>
         </Modal>
 
-        <Modal v-model:open="create_open" v-model:showLoader="create_loader_open">
+        <Modal v-model:open="create_w_open" v-model:showLoader="create_w_loader_open">
           <template v-slot:header>New user</template>
           <template v-slot:body>
             <div class="my-2">
               <p>Email</p>
-              <input type="email" v-model="newUser.email" class="sm:col-span-3 mt-1 rounded" />
+              <input type="email" v-model="newItem.email" class="sm:col-span-3 mt-1 rounded" />
 
               <p>Password</p>
-              <input type="email" v-model="newUser.password" class="sm:col-span-3 mt-1 rounded" />
+              <input type="email" v-model="newItem.password" class="sm:col-span-3 mt-1 rounded" />
 
               <p class="mt-3">Roles</p>
               <div class="lg:col-span-2 mt-2">
-                <treeselect v-model="newUser.roles" :multiple="true" :options="roleOptions" :load-options="loadOptions" />
+                <treeselect v-model="newItem.roles" :multiple="true" :options="roleOptions" :load-options="loadOptions" />
               </div>
             </div>
           </template>
           <template v-slot:footer>
-            <button type="button" class="btn-secondary" @click="create_open = false">Cancel</button>
-            <button type="button" class="btn-primary mr-3" @click="createUser">Create</button>
+            <button type="button" class="btn-secondary" @click="tableMgr.CloseCreateWindow">Cancel</button>
+            <button type="button" class="btn-primary mr-3" @click="tableMgr.Create">Create</button>
           </template>
         </Modal>
+
       </div>
     </div>
   </SidebarLayout>
