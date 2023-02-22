@@ -4,7 +4,7 @@ import SidebarLayout from "@/layouts/sidebar/SidebarLayout.vue";
 
 import Modal from "@/components/core/modal/Modal.vue";
 import { PencilSquareIcon, MagnifyingGlassIcon, PlusCircleIcon, ArrowPathIcon } from "@heroicons/vue/24/outline";
-import { ref,toRaw } from "vue";
+import { ref, toRaw } from "vue";
 
 import { useToast } from "vue-toastification";
 import SingleSelect from "@/components/core/select/SingleSelect.vue";
@@ -111,8 +111,8 @@ async function loadOptions({ action /*, callback*/ }) {
 }
 
 async function searchFn(tableMgr) {
- 
-  let search_params=toRaw(search_condition.value)
+
+  let search_params = toRaw(search_condition.value)
 
   let id = null;
   if (search_params.id !== null && search_params.id.trim() !== "") {
@@ -126,7 +126,7 @@ async function searchFn(tableMgr) {
 
   let token = null;
   if (search_params.token !== null && search_params.token.trim() != "") {
-    token =  search_params.token.trim();
+    token = search_params.token.trim();
   }
 
   let { limit, offset } = tableMgr.getLimitOffset();
@@ -168,18 +168,20 @@ function resetNewItem() {
 
 async function createSubmit(tableMgr) {
 
-  if (!validator.validateEmail(newItem.value.email)) {
+  let create_params = toRaw(newItem.value)
+
+  if (!validator.validateEmail(create_params.email)) {
     toast.error("email error");
     return false;
   }
 
-  if (!validator.validatePassword(newItem.value.password)) {
+  if (!validator.validatePassword(create_params.password)) {
     toast.error("password error," + t("password_rule"));
     return false;
   }
 
   //request api
-  let resp = await api.user.createUser(newItem.value.email, newItem.value.password, newItem.value.roles, newItem.value.permissions, auth_store.token);
+  let resp = await api.user.createUser(create_params.email, create_params.password, create_params.roles, create_params.permissions, auth_store.token);
   if (resp.err !== null) {
     toast.error(resp.err);
     return false;
@@ -228,10 +230,10 @@ let table_config = {
 }
 
 let table_callback = {
-    searchFn: searchFn,
-    createSubmit: createSubmit,
-    updateDelete: updateDelete,
-    updateSubmit: updateSubmit,
+  searchFn: searchFn,
+  createSubmit: createSubmit,
+  updateDelete: updateDelete,
+  updateSubmit: updateSubmit,
 }
 
 let { tableMgr, currentRow,
