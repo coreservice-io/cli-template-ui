@@ -22,6 +22,7 @@ function NewTableMgr(config, colums, table_callback) {
   table_mgr.config.per_page = 10;
   table_mgr.config.sort = [];
   table_mgr.config.perPageDropdown = [10, 20, 50, 100];
+  table_mgr.config.select_enable=true;
 
   if (!config) {
     console.log("err:config required")
@@ -51,6 +52,10 @@ function NewTableMgr(config, colums, table_callback) {
     table_mgr.config.perPageDropdown = config.perPageDropdown
   }
 
+  if (typeof config.select_enable != undefined) {
+    table_mgr.config.select_enable = config.select_enable
+  }
+
   ///////////////////////////////////////
   if (!colums) {
     console.log("err:colums required")
@@ -75,8 +80,8 @@ function NewTableMgr(config, colums, table_callback) {
   }
 
   table_mgr.onSelectedRows = function (rows) {
-    if (typeof table_mgr.table_callback.onSelectedRow != "undefined") {
-      table_mgr.table_callback.onSelectedRow(rows)
+    if (typeof table_mgr.table_callback.onSelectedRows != "undefined") {
+      table_mgr.table_callback.onSelectedRows(rows)
     }
   }
 
@@ -244,7 +249,7 @@ function NewTableMgr(config, colums, table_callback) {
   };
 
   table_mgr.select_options = {
-    enabled: true,
+    enabled: table_mgr.config.select_enable,
     selectOnCheckboxOnly: true, // only select when checkbox is clicked instead of the row
   }
 
@@ -253,7 +258,6 @@ function NewTableMgr(config, colums, table_callback) {
     placeholder: 'search table',
   }
   //
-
 
   return {
     tableMgr: table_mgr,

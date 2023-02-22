@@ -227,6 +227,7 @@ async function updateSubmit(tableMgr) {
 ////////table config///////
 let table_config = {
   mode: 'remote',
+  select_enable:false,
 }
 
 let table_callback = {
