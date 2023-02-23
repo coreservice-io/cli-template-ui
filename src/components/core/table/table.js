@@ -29,30 +29,30 @@ function NewTableMgr(config, colums, table_callback) {
     return null
   }
 
-  if (typeof config.mode == undefined) {
+  if (typeof config.mode == "undefined") {
     console.log("err:config.mode required")
     return null
   } else {
     table_mgr.config.mode = config.mode
   }
 
-  if (typeof config.current_page != undefined) {
+  if (typeof config.current_page != "undefined") {
     table_mgr.config.current_page = config.current_page
   }
 
-  if (typeof config.per_page != undefined) {
+  if (typeof config.per_page != "undefined") {
     table_mgr.config.per_page = config.per_page
   }
 
-  if (typeof config.sort != undefined) {
+  if (typeof config.sort != "undefined") {
     table_mgr.config.sort = config.sort
   }
 
-  if (typeof config.perPageDropdown != undefined) {
+  if (typeof config.perPageDropdown != "undefined") {
     table_mgr.config.perPageDropdown = config.perPageDropdown
   }
 
-  if (typeof config.select_enable != undefined) {
+  if (typeof config.select_enable != "undefined") {
     table_mgr.config.select_enable = config.select_enable
   }
 
@@ -67,7 +67,7 @@ function NewTableMgr(config, colums, table_callback) {
     return null
   }
 
-  if (typeof table_callback.searchFn == undefined) {
+  if (typeof table_callback.searchFn == "undefined") {
     console.log("err:table_callback searchFn required")
     return null
   }
