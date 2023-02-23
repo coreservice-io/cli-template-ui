@@ -1,5 +1,5 @@
 <script setup>
-import router from "@/router/Router.vue";
+import { useRoute } from 'vue-router'
 
 import Fade from "@/layouts/overlay/Fade.vue";
 
@@ -16,13 +16,15 @@ import { useI18n } from "vue-i18n";
 import lang_message from "./topbar_lang";
 const { t } = useI18n({ messages: lang_message });
 
+const router = useRoute()
+
 const pages = [
   { name: "sign_in", href: "/signin", active: false },
   { name: "register", href: "/register", active: false },
   { name: "reset_pass", href: "/resetpass", active: false },
 ];
 function page_active(href) {
-  if (router.currentRoute.value.path == href) {
+  if (router.path == href) {
     return true;
   } else {
     return false;
