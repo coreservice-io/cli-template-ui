@@ -18,6 +18,7 @@
     "axios": "^1.2.4",
     "axios-mock-adapter": "^1.21.2",
     "codemirror": "^6.0.1",
+    "crypto-js": "^4.1.1",
     "install": "^0.13.0",
     "moment": "^2.29.4",
     "npm": "^9.4.0",
