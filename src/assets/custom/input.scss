@@ -154,28 +154,39 @@ input.err {
         @apply inline-flex;
 
         input {
-            @apply w-full;         
+            @apply w-full;
         }
     }
 
     .btn {
-        @apply border;
-        @apply bg-gray-50;
-        @apply border-gray-300;
-        @apply bg-gray-50;
-        @apply -ml-px;
-        @apply text-gray-700;
-        @apply px-4;
-        @apply whitespace-nowrap;
-        @apply cursor-pointer;
         @apply hover:bg-gray-100;
-        @apply inline-flex;
-        @apply items-center;
+        @apply cursor-pointer;
 
         &.disabled {
             @apply hover:bg-gray-50;
             @apply cursor-not-allowed;
         }
+    }
+
+    .tab {
+        &.disabled {
+            @apply bg-gray-50;
+            @apply border-gray-200;
+        }
+    }
+
+    .btn,
+    .tab {
+        @apply border;
+        @apply bg-gray-50;
+        @apply border-gray-300;
+        @apply bg-gray-50;
+        @apply text-gray-700;
+        @apply px-4;
+        @apply whitespace-nowrap;
+        @apply inline-flex;
+        @apply items-center;
+        @apply mb-0;
 
         span {
             @apply text-gray-700;
