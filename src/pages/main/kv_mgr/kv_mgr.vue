@@ -216,7 +216,7 @@ tableMgr.loadItems();
           </template>
         </good-table>
 
-        <Modal v-model:open="update_w_open" v-model:showLoader="update_w_loader_open">
+        <Modal v-model:open="update_w_open" :showLoader="update_w_loader_open">
           <template v-slot:header>Edit</template>
           <template v-slot:body>
             <div class="my-2">
@@ -239,7 +239,7 @@ tableMgr.loadItems();
           </template>
         </Modal>
 
-        <Modal v-model:open="create_w_open" v-model:showLoader="create_w_loader_open">
+        <Modal v-model:open="create_w_open" :showLoader="create_w_loader_open">
           <template v-slot:header>Create</template>
           <template v-slot:body>
             <div class="my-2">
