@@ -150,7 +150,7 @@ async function submit_reg() {
           <div class="prefix">
             <CalculatorIcon class="icon" />
           </div>
-          <input type="text" v-model="captcha_mgr.captcha.value" class="pl-10 rounded-l" :placeholder="t('input_captcha')" />
+          <input type="text" v-model="captcha_mgr.captcha.value" class="pl-10 rounded-l border-r-0" :placeholder="t('input_captcha')" />
         </div>
 
         <div class="btn rounded-r" v-tippy="{ placement: 'bottom', content: t('change_captcha') }" @click="captcha_mgr.refresh_captcha">
@@ -164,7 +164,7 @@ async function submit_reg() {
           <div class="prefix">
             <KeyIcon class="icon" />
           </div>
-          <input type="text" name="vcode" id="vcode" v-model="vcode_mgr.vcode.value" class="pl-10 rounded-l" placeholder="input your v-code" />
+          <input type="text" name="vcode" id="vcode" v-model="vcode_mgr.vcode.value" class="pl-10 rounded-l border-r-0" placeholder="input your v-code" />
         </div>
 
         <div v-if="vcode_mgr.loader_secs.value == 0" :class="[send_vcode_ready ? '' : 'disabled', 'btn']" class="btn rounded-r" v-tippy="{ placement: 'bottom', content: send_vcode_ready ? t('send_vcode_to_email') : t('complete_vcode_to_email') }" @click="send_vcode">

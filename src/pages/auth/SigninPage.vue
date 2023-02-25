@@ -109,7 +109,7 @@ async function submit_signin() {
           <div class="prefix">
             <CalculatorIcon class="icon" />
           </div>
-          <input type="text" v-model="captcha_mgr.captcha.value" class="pl-10 rounded-l" :placeholder="t('input_captcha')" />
+          <input type="text" v-model="captcha_mgr.captcha.value" class="pl-10 rounded-l border-r-0" :placeholder="t('input_captcha')" />
         </div>
 
         <div class="btn rounded-r" v-tippy="{ placement: 'bottom', content: t('change_captcha') }" @click="captcha_mgr.refresh_captcha">
