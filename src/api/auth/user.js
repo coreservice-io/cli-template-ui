@@ -48,7 +48,7 @@ async function getCaptcha() {
   return await request.Get(url);
 }
 
-async function getEmailVCodeWithLen(email, captchaId, captcha, vcodeLen) {
+async function getEmailVCode(email, captchaId, captcha, vcodeLen) {
   let url = config.api.endpoint + "/api/user/email_vcode";
   return await request.Post(url, {
     vcode_len:vcodeLen,
@@ -118,7 +118,7 @@ export default {
   resetPassword,
   getUserInfo,
   getCaptcha,
-  getEmailVCodeWithLen,
+  getEmailVCode,
   queryUser,
   updateUser,
   createUser

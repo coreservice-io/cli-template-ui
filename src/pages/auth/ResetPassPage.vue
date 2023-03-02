@@ -58,7 +58,7 @@ let send_vcode = async function () {
 
   vcode_mgr.resetLoader();
 
-  if (!await vcode_mgr.getEmailVCodeWithLen(email.value, captcha_mgr.captchaId, captcha_mgr.captcha.value, 16)) {
+  if (!await vcode_mgr.getEmailVCode(email.value, captcha_mgr.captchaId, captcha_mgr.captcha.value, 16)) {
     captcha_mgr.refresh_captcha();
   }
 

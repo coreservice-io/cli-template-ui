@@ -24,8 +24,8 @@ function NewVcodeMgr(id) {
   }
 
   ///
-  vcode_mgr.getEmailVCodeWithLen = async function (email, captchaId, captcha , vcodeLen) {
-    let resp = await api.user.getEmailVCodeWithLen(email, captchaId, captcha, vcodeLen);
+  vcode_mgr.getEmailVCode = async function (email, captchaId, captcha , vcodeLen) {
+    let resp = await api.user.getEmailVCode(email, captchaId, captcha, vcodeLen);
     if (resp.err !== null) {
       toast.error(resp.err);
       return false;
