@@ -58,10 +58,10 @@ let send_vcode = async function () {
 
   vcode_mgr.resetLoader();
 
-  if (!await vcode_mgr.getEmailVCode(email.value, captcha_mgr.captchaId, captcha_mgr.captcha.value)){
+  if (!await vcode_mgr.getEmailVCodeWithLen(email.value, captcha_mgr.captchaId, captcha_mgr.captcha.value, 16)) {
     captcha_mgr.refresh_captcha();
   }
-  
+
 };
 
 //
@@ -77,7 +77,7 @@ async function submit_reset_pass() {
   if (!validate_reset_pass_ready.value) {
     return;
   }
- 
+
   const overlay_store = useOverlayStore();
   overlay_store.showLoader();
   let resp = await api.user.resetPassword(email.value, password.value, vcode_mgr.vcode.value);
@@ -113,7 +113,8 @@ async function submit_reset_pass() {
         <div class="prefix">
           <EnvelopeIcon class="icon" />
         </div>
-        <input id="email" name="email" type="email" autocomplete="email" v-model="email" :class="[validate_email ? '' : 'err', 'rounded relative pl-10']" placeholder="email" />
+        <input id="email" name="email" type="email" autocomplete="email" v-model="email"
+          :class="[validate_email ? '' : 'err', 'rounded relative pl-10']" placeholder="email" />
         <div :class="validate_email && email != '' ? 'visible' : 'invisible'" class="suffix">
           <CheckIcon class="h-5 w-5 text-success" />
         </div>
@@ -124,7 +125,10 @@ async function submit_reset_pass() {
           <div class="prefix">
             <LockClosedIcon class="icon" />
           </div>
-          <input id="password" name="password" type="password" v-model="password" v-tippy="{ placement: 'right', content: t('password_rule'), trigger: 'focus' }" :class="[validate_password ? '' : 'err', 'relative pl-10 rounded-t']" autocomplete="current-password" :placeholder="t('new_password')" />
+          <input id="password" name="password" type="password" v-model="password"
+            v-tippy="{ placement: 'right', content: t('password_rule'), trigger: 'focus' }"
+            :class="[validate_password ? '' : 'err', 'relative pl-10 rounded-t']" autocomplete="current-password"
+            :placeholder="t('new_password')" />
 
           <div :class="validate_password && password != '' ? 'visible' : 'invisible'" class="suffix">
             <CheckIcon class="h-5 w-5 text-success" />
@@ -135,7 +139,9 @@ async function submit_reset_pass() {
           <div class="prefix">
             <LockClosedIcon class="icon" />
           </div>
-          <input id="password_again" name="password_again" type="password" v-model="password_again" autocomplete="current-password" :class="[validate_password_again ? '' : 'err', 'relative pl-10 rounded-b']" :placeholder="t('new_password_again')" />
+          <input id="password_again" name="password_again" type="password" v-model="password_again"
+            autocomplete="current-password" :class="[validate_password_again ? '' : 'err', 'relative pl-10 rounded-b']"
+            :placeholder="t('new_password_again')" />
           <div :class="validate_password_again && password_again != '' ? 'visible' : 'invisible'" class="suffix">
             <CheckIcon class="h-5 w-5 text-success" />
           </div>
@@ -147,12 +153,16 @@ async function submit_reset_pass() {
           <div class="prefix">
             <CalculatorIcon class="icon" />
           </div>
-          <input type="text" v-model="captcha_mgr.captcha.value" class="pl-10 rounded-l border-r-0" :placeholder="t('input_captcha')" />
+          <input type="text" v-model="captcha_mgr.captcha.value" class="pl-10 rounded-l border-r-0"
+            :placeholder="t('input_captcha')" />
         </div>
 
-        <div class="btn rounded-r" v-tippy="{ placement: 'bottom', content: t('change_captcha') }" @click="captcha_mgr.refresh_captcha">
+        <div class="btn rounded-r" v-tippy="{ placement: 'bottom', content: t('change_captcha') }"
+          @click="captcha_mgr.refresh_captcha">
           <img v-if="captcha_mgr.captchaBase64.value !== ''" class="captcha" :src="captcha_mgr.captchaBase64.value" />
-          <p v-else><ArrowPathIcon />loading.......</p>
+          <p v-else>
+            <ArrowPathIcon />loading.......
+          </p>
         </div>
       </div>
 
@@ -161,10 +171,14 @@ async function submit_reset_pass() {
           <div class="prefix">
             <KeyIcon class="icon" />
           </div>
-          <input type="text" name="vcode" id="vcode" v-model="vcode_mgr.vcode.value" class="pl-10 rounded-l border-r-0" placeholder="input your v-code" />
+          <input type="text" name="vcode" id="vcode" v-model="vcode_mgr.vcode.value" class="pl-10 rounded-l border-r-0"
+            placeholder="input your v-code" />
         </div>
 
-        <div v-if="vcode_mgr.loader_secs.value == 0" :class="[send_vcode_ready ? '' : 'disabled', 'btn']" class="btn rounded-r" v-tippy="{ placement: 'bottom', content: send_vcode_ready ? t('send_vcode_to_email') : t('complete_vcode_to_email') }" @click="send_vcode">
+        <div v-if="vcode_mgr.loader_secs.value == 0" :class="[send_vcode_ready ? '' : 'disabled', 'btn']"
+          class="btn rounded-r"
+          v-tippy="{ placement: 'bottom', content: send_vcode_ready ? t('send_vcode_to_email') : t('complete_vcode_to_email') }"
+          @click="send_vcode">
           <PaperAirplaneIcon /><span>{{ t("send") }}</span>
         </div>
         <div v-if="vcode_mgr.loader_secs.value != 0" class="btn rounded-r">
@@ -172,14 +186,16 @@ async function submit_reset_pass() {
         </div>
       </div>
 
-      <div @click="submit_reset_pass" :class="[validate_reset_pass_ready ? '' : 'disabled', ' btn-primary w-full relative mt-3 mb-3']"><UserPlusIcon class="icon dark absolute left-3" />{{ t("submit") }}</div>
-
-      <Divider>{{ t("or") }}</Divider>
-
-      <router-link to="/signin" class="mt-3 btn-secondary w-full relative">
-        <CursorArrowRaysIcon class="icon dark absolute left-3" aria-hidden="true" />
-        {{ t("sign_in_exist") }}
-      </router-link>
+    <div @click="submit_reset_pass"
+      :class="[validate_reset_pass_ready ? '' : 'disabled', ' btn-primary w-full relative mt-3 mb-3']">
+      <UserPlusIcon class="icon dark absolute left-3" />{{ t("submit") }}
     </div>
-  </TopbarNavLayout>
-</template>
+
+    <Divider>{{ t("or") }}</Divider>
+
+    <router-link to="/signin" class="mt-3 btn-secondary w-full relative">
+      <CursorArrowRaysIcon class="icon dark absolute left-3" aria-hidden="true" />
+      {{ t("sign_in_exist") }}
+    </router-link>
+  </div>
+</TopbarNavLayout></template>

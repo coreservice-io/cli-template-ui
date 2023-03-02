@@ -48,30 +48,31 @@ async function getCaptcha() {
   return await request.Get(url);
 }
 
-async function getEmailVCode(email, captchaId, captcha) {
+async function getEmailVCodeWithLen(email, captchaId, captcha, vcodeLen) {
   let url = config.api.endpoint + "/api/user/email_vcode";
   return await request.Post(url, {
+    vcode_len:vcodeLen,
     email: email,
     captcha_id: captchaId,
     captcha: captcha,
   });
 }
 
-async function queryUser(userId, emailPattern,userToken, forbidden, limit, offset, token) {
+async function queryUser(userId, emailPattern, userToken, forbidden, limit, offset, token) {
   let url = config.api.endpoint + "/api/user/admin/query";
   return await request.Post(
-      url,
-      {
-          filter: {
-              id: userId,
-              email_pattern: emailPattern,
-              token:userToken,
-              forbidden: forbidden,
-          },
-          limit: limit,
-          offset: offset,
+    url,
+    {
+      filter: {
+        id: userId,
+        email_pattern: emailPattern,
+        token: userToken,
+        forbidden: forbidden,
       },
-      token
+      limit: limit,
+      offset: offset,
+    },
+    token
   );
 }
 
@@ -79,34 +80,34 @@ async function queryUser(userId, emailPattern,userToken, forbidden, limit, offse
 async function updateUser(id, forbidden, roles, permissions, token) {
   let url = config.api.endpoint + "/api/user/admin/update";
   return await request.Post(
-      url,
-      {
-          filter: {
-              id: [id],
-          },
-          update: {
-              forbidden: forbidden,
-              roles: roles,
-              permissions: permissions,
-          },
+    url,
+    {
+      filter: {
+        id: [id],
       },
-      token
+      update: {
+        forbidden: forbidden,
+        roles: roles,
+        permissions: permissions,
+      },
+    },
+    token
   );
-}   
+}
 
-async function createUser(email, password,roles, permissions, token) {
+async function createUser(email, password, roles, permissions, token) {
   let url = config.api.endpoint + "/api/user/admin/create";
   return await request.Post(
-      url,
-      {
-          email:email,
-          password:password,
-          roles:roles,
-          permissions:permissions
-      },
-      token
+    url,
+    {
+      email: email,
+      password: password,
+      roles: roles,
+      permissions: permissions
+    },
+    token
   );
-} 
+}
 
 /////////////////////////////////////////////////////////////
 
@@ -117,7 +118,7 @@ export default {
   resetPassword,
   getUserInfo,
   getCaptcha,
-  getEmailVCode,
+  getEmailVCodeWithLen,
   queryUser,
   updateUser,
   createUser
