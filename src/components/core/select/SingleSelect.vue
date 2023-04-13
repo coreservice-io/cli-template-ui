@@ -1,9 +1,9 @@
 <script setup>
-import { ref, watch, computed,toRef } from "vue";
+import { ref, watch, computed, toRef } from "vue";
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/vue";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/vue/20/solid";
 
-const props = defineProps(["options", "modelValue"]);
+const props = defineProps(["options", "modelValue", "placeHolder"]);
 
 const all_options = [null];
 
@@ -18,9 +18,9 @@ props.options.forEach(element => {
 
 const selected = ref(props.modelValue);
 
-const prop_selected=  toRef(props,'modelValue')
+const prop_selected = toRef(props, 'modelValue')
 watch(prop_selected, (new_prop_selected) => {
-  selected.value=new_prop_selected
+  selected.value = new_prop_selected
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -57,7 +57,7 @@ let SelectedItem = computed(() => {
         </template>
         <template v-else>
           <span class="list-header-empty">
-            <span class="truncate">select</span>
+            <span class="truncate">{{ props.placeHolder }}</span>
           </span>
         </template>
         <span class="list-header-suffix">
@@ -70,9 +70,11 @@ let SelectedItem = computed(() => {
           <ListboxOption as="template" v-if="option != null" :value="option" v-slot="{ active, selected }">
             <li :class="[active ? 'active' : 'inactive']">
               <div class="option-row">
-                <span v-if="(typeof all_full_options[option].active != 'undefined')" :class="[all_full_options[option].active ? 'active' : 'inactive', 'status']"></span>
+                <span v-if="(typeof all_full_options[option].active != 'undefined')"
+                  :class="[all_full_options[option].active ? 'active' : 'inactive', 'status']"></span>
                 <span :class="[selected ? 'active' : 'inactive', 'name']">{{ all_full_options[option].name }}</span>
-                <span :class="[active ? 'active' : 'inactive', 'secondary']">{{ all_full_options[option].secondary }}</span>
+                <span :class="[active ? 'active' : 'inactive', 'secondary']">{{ all_full_options[option].secondary
+                }}</span>
                 <span v-if="selected" :class="[active ? 'active' : 'inactive', 'suffix']">
                   <CheckIcon />
                 </span>
