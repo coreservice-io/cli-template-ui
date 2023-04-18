@@ -21,10 +21,10 @@ select {
     @apply sm:text-sm;
 
     &.disabled {
-        @apply disabled:cursor-not-allowed;
-        @apply disabled:border-gray-200;
-        @apply disabled:bg-gray-50;
-        @apply disabled:text-gray-500;
+        @apply cursor-not-allowed;
+        @apply bg-gray-50;
+        @apply text-gray-400;
+        @apply placeholder-gray-400;
     }
 
     @apply focus:z-10;
@@ -181,7 +181,7 @@ input.err {
         @apply bg-gray-50;
         @apply border-gray-300;
         @apply bg-gray-50;
-        @apply text-gray-700;
+        @apply text-gray-500;
         @apply px-4;
         @apply whitespace-nowrap;
         @apply inline-flex;
@@ -189,7 +189,7 @@ input.err {
         @apply mb-0;
 
         span {
-            @apply text-gray-700;
+            @apply text-gray-500;
         }
 
         svg {

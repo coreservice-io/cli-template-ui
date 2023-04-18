@@ -124,7 +124,7 @@ async function submit_signin() {
 
       <Divider>{{ t("or") }}</Divider>
 
-      <router-link to="/register" class="mt-3 btn-secondary w-full relative">
+      <router-link to="/register" class="mt-3 btn-secondary light w-full relative">
         <UserPlusIcon class="icon dark absolute left-3" />
         {{ t("no_account_yet") }}
       </router-link>

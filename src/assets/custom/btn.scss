@@ -25,9 +25,16 @@
     @apply border-gray-300;
     @apply bg-white;
     @apply hover:bg-gray-50;
-    @apply text-gray-700;
+    @apply text-gray-600;
     @apply hover:bg-gray-50;
     @apply focus:ring-indigo-500;
+
+    &.light{
+        @apply text-gray-400;
+        &:hover{
+            @apply text-gray-500;
+        }
+    }
 
     .prefix-icon,
     .icon,

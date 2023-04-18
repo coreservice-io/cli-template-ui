@@ -4,7 +4,7 @@
           <div class="w-full border-t border-gray-300" />
         </div>
         <div class="relative flex justify-center text-sm">
-          <span class="bg-white px-2 text-gray-500">
+          <span class="bg-white px-2 text-gray-400">
             <slot></slot>
           </span>
         </div>

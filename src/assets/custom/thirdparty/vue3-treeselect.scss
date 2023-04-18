@@ -91,6 +91,47 @@
 ///////fix////////
 
 .vue-treeselect {
+    .vue-treeselect__control {
+        @apply rounded-none;
+    }
+}
+
+.vue-treeselect.rounded {
+    .vue-treeselect__control {
+        @apply rounded-md;
+    }
+}
+
+.vue-treeselect.rounded-r {
+    .vue-treeselect__control {
+        border-top-right-radius: 0.25rem; /* 4px */
+        border-bottom-right-radius: 0.25rem; /* 4px */
+    }
+}
+
+.vue-treeselect.rounded-l {
+    .vue-treeselect__control {
+        border-top-left-radius: 0.25rem; /* 4px */
+        border-bottom-left-radius: 0.25rem; /* 4px */
+    }
+}
+
+.vue-treeselect.rounded-t {
+    .vue-treeselect__control {
+        border-top-left-radius: 0.25rem; /* 4px */
+        border-top-right-radius: 0.25rem; /* 4px */
+    }
+}
+
+.vue-treeselect.rounded-b {
+    .vue-treeselect__control {
+        border-bottom-left-radius: 0.25rem; /* 4px */
+        border-bottom-right-radius: 0.25rem; /* 4px */
+    }
+}
+
+
+.vue-treeselect {
     .vue-treeselect__checkbox--disabled,
     .vue-treeselect__label-container:hover .vue-treeselect__checkbox--disabled {
         border-color: #e0e0e0;

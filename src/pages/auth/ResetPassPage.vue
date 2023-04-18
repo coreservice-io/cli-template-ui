@@ -193,7 +193,7 @@ async function submit_reset_pass() {
 
     <Divider>{{ t("or") }}</Divider>
 
-    <router-link to="/signin" class="mt-3 btn-secondary w-full relative">
+    <router-link to="/signin" class="mt-3 btn-secondary light w-full relative">
       <CursorArrowRaysIcon class="icon dark absolute left-3" aria-hidden="true" />
       {{ t("sign_in_exist") }}
     </router-link>
