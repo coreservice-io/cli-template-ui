@@ -7,9 +7,10 @@ import { PencilSquareIcon, MagnifyingGlassIcon, PlusCircleIcon, ArrowPathIcon } 
 import { ref, toRaw } from "vue";
 
 import { useToast } from "vue-toastification";
-import SingleSelect from "@/components/core/select/SingleSelect.vue";
-import Treeselect from "vue3-treeselect";
-import { LOAD_ROOT_OPTIONS } from "vue3-treeselect";
+
+import Multiselect from '@vueform/multiselect'
+
+// import { LOAD_ROOT_OPTIONS } from "vue3-treeselect";
 
 import api from "@/api";
 import useAuthStore from "@/stores/auth";
@@ -89,26 +90,21 @@ function ResetSearch() {
 }
 
 /////////////////////
-let roleOptions = ref(null);
-async function loadOptions({ action /*, callback*/ }) {
-  if (action === LOAD_ROOT_OPTIONS) {
-    // request api
-    let resp = await api.user.auth_config();
+async function load_remote_roles(query) {
+  // request api
+  let resp = await api.user.auth_config();
 
-    if (resp.err !== null) {
-      throw new Error("Failed to load options");
-    }
-
-    if (resp.result.meta_status < 0) {
-      throw new Error("Failed to load options,err:" + resp.result.meta_message);
-    }
-
-    roleOptions.value = resp.result.roles.map((id) => ({
-      id,
-      label: `${id}`,
-    }));
+  if (resp.err !== null) {
+    throw new Error("Failed to load options");
   }
+
+  if (resp.result.meta_status < 0) {
+    throw new Error("Failed to load options,err:" + resp.result.meta_message);
+  }
+
+  return resp.result.roles;
 }
+
 
 async function searchFn(tableMgr) {
 
@@ -227,7 +223,7 @@ async function updateSubmit(tableMgr) {
 ////////table config///////
 let table_config = {
   mode: 'remote',
-  select_enable:false,
+  select_enable: false,
 }
 
 let table_callback = {
@@ -295,10 +291,10 @@ tableMgr.loadItems();
 
               <div class="lg:col-span-1 input-wrap sm">
                 <div class="lg:col-span-2 mt-2">
-                  <SingleSelect :options="[
-                    { name: 'Only forbidden user', value: true },
-                    { name: 'Only active user', value: false },
-                  ]" v-model="search_condition.forbidden"></SingleSelect>
+                  <Multiselect :options="[
+                      { label: 'Only forbidden user', value: true },
+                      { label: 'Only active user', value: false },
+                    ]" v-model="search_condition.forbidden"></Multiselect>
                 </div>
               </div>
             </div>
@@ -353,8 +349,7 @@ tableMgr.loadItems();
               <input type="email" v-model="currentRow.email" class="sm:col-span-3 mt-1 rounded disabled" disabled="" />
               <p class="mt-4">Roles</p>
               <div class="lg:col-span-2 mt-2">
-                <treeselect v-model="currentRow.roles" :multiple="true" :options="roleOptions"
-                  :load-options="loadOptions" />
+                <Multiselect v-model="currentRow.roles" mode="tags" :options="load_remote_roles" />
               </div>
               <p class="mt-5">Forbidden</p>
               <div>
@@ -381,7 +376,7 @@ tableMgr.loadItems();
 
               <p class="mt-3">Roles</p>
               <div class="lg:col-span-2 mt-2">
-                <treeselect v-model="newItem.roles" :multiple="true" :options="roleOptions" :load-options="loadOptions" />
+                <Multiselect v-model="newItem.roles" mode="tags" :options="load_remote_roles" />
               </div>
             </div>
           </template>
