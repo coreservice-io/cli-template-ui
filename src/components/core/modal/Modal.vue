@@ -30,8 +30,7 @@ function close() {
             enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200"
             leave-from="opacity-100 translate-y-0 sm:scale-100"
             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-            <DialogPanel style="z-index: inherit"
-              :class="['relative transform rounded-lg bg-white text-left shadow-xl transition-all xl:max-w-7xl my-8 min-w-[90%] xs:min-w-[80%] sm:min-w-[70%] md:min-w-[50%] lg:min-w-[40%] xl:min-w-[40%] 2xl:min-w-[30%]', props.class ? props.class : '']">
+            <DialogPanel :class="['relative transform rounded-lg bg-white text-left shadow-xl transition-all xl:max-w-7xl my-8 min-w-[90%] xs:min-w-[80%] sm:min-w-[70%] md:min-w-[50%] lg:min-w-[40%] xl:min-w-[40%] 2xl:min-w-[30%]', props.class ? props.class : '']">
               <div v-show="props.showLoader" class="w-full h-full absolute bg-white z-50 opacity-90 rounded-lg">
                 <div
                   class="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 absolute bg-gray-100 border border-gray-200 shadow text-black rounded py-2 px-5 flex">
