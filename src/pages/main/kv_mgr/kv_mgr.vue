@@ -178,7 +178,7 @@ let { tableMgr, currentRow,
 
 
 //inital loading
-tableMgr.loadItems();
+tableMgr.resetAndLoad();
 
 </script>
 
@@ -200,7 +200,7 @@ tableMgr.loadItems();
             <button type="button" @click="tableMgr.OpenCreateWindow" class="btn-primary sm mr-3">
               <PlusCircleIcon class="prefix-icon" />Add Key
             </button>
-            <button type="button" @click="tableMgr.loadItems" class="btn-secondary sm mr-3">
+            <button type="button" @click="tableMgr.resetAndLoad" class="btn-secondary sm mr-3">
               <ArrowPathIcon class="prefix-icon" />Refresh
             </button>
           </template>

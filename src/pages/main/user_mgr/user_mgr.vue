@@ -239,7 +239,7 @@ let { tableMgr, currentRow,
 
 /////////////////////////////////////////////
 //inital loading
-tableMgr.loadItems();
+tableMgr.resetAndLoad();
 
 /////////////////////////////////////////////
 
@@ -264,7 +264,7 @@ tableMgr.loadItems();
             <button type="button" @click="tableMgr.OpenCreateWindow" class="btn-primary sm mr-3">
               <PlusCircleIcon class="prefix-icon" />New user
             </button>
-            <button type="button" @click="tableMgr.loadItems" class="btn-secondary sm mr-3">
+            <button type="button" @click="tableMgr.resetAndLoad" class="btn-secondary sm mr-3">
               <ArrowPathIcon class="prefix-icon" />Refresh
             </button>
             <button type="button" @click="tableMgr.toggleSearchWindow" class="btn-secondary sm">

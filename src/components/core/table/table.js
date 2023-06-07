@@ -232,6 +232,17 @@ function NewTableMgr(config, colums, table_callback) {
     });
   };
 
+  table_mgr.resetAndLoad = function () {
+    table_mgr.config.current_page = 1;
+    //
+    if(typeof table_mgr.table_api_reset === "undefined"){
+    }else{
+      table_mgr.table_api_reset();
+    }
+    //
+    table_mgr.loadItems();
+  }
+
   table_mgr.toggleSearchWindow = function () {
     table_mgr.search_w_open.value = !table_mgr.search_w_open.value;
   };
