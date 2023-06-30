@@ -126,7 +126,7 @@ async function submit_reset_pass() {
             <LockClosedIcon class="icon" />
           </div>
           <input id="password" name="password" type="password" v-model="password"
-            v-tippy="{ placement: 'right', content: t('password_rule'), trigger: 'focus' }"
+            v-tippy="{ placement: 'bottom', content: t('password_rule'), trigger: 'focus', hideOnClick: false }"
             :class="[validate_password ? '' : 'err', 'relative pl-10 rounded-t']" autocomplete="current-password"
             :placeholder="t('new_password')" />
 
@@ -140,6 +140,7 @@ async function submit_reset_pass() {
             <LockClosedIcon class="icon" />
           </div>
           <input id="password_again" name="password_again" type="password" v-model="password_again"
+            v-tippy="{ placement: 'bottom', content: t('new_password_again'), trigger: 'focus', hideOnClick: false }"
             autocomplete="current-password" :class="[validate_password_again ? '' : 'err', 'relative pl-10 rounded-b']"
             :placeholder="t('new_password_again')" />
           <div :class="validate_password_again && password_again != '' ? 'visible' : 'invisible'" class="suffix">
